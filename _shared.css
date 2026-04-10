@@ -392,6 +392,8 @@ body {
 }
 .section h3 { font-size: 1rem; font-weight: 700; color: var(--text); margin: 1.4rem 0 .6rem; }
 .section p  { color: var(--text-muted); margin-bottom: .8rem; }
+.section a, .callout a { color: var(--accent); text-decoration: none; }
+.section a:hover, .callout a:hover { text-decoration: underline; }
 
 /* -- Premium Cards -- */
 .cards { 
