@@ -9,16 +9,55 @@
 
 <div class="section">
   <h2>Setup</h2>
-  
+
+  <p>Before using group methods, you must inject a handler that processes incoming group control messages. The SDK handles cryptography and networking, but delegates database operations and UI updates to your app.</p>
+
   <div class="method-block">
     <div class="method-header">
       <span class="method-name">SetGroupHandler</span>
       <span class="method-return">void</span>
     </div>
     <div class="method-body">
-      <p class="method-desc">Injects the group message handler for processing incoming group control messages. Call once after DI resolves all singletons.</p>
-      <pre>sdk.<span class="met">SetGroupHandler</span>(groupHandler);</pre>
+      <p class="method-desc">Injects your implementation of <code>IGroupHandler</code> for processing incoming group control messages. Call once after DI resolves all singletons.</p>
+      <pre><span class="cm">// In your app startup (e.g., App.xaml.cs or MauiProgram.cs)</span>
+<span class="kw">var</span> groupHandler = serviceProvider.<span class="met">GetRequiredService</span>&lt;<span class="cls">GroupMessageHandler</span>&gt;();
+sdk.<span class="met">SetGroupHandler</span>(groupHandler);</pre>
     </div>
+  </div>
+
+  <h3>Implementing IGroupHandler</h3>
+  <p>Your handler receives decrypted group messages and applies them to your local state:</p>
+
+  <pre><span class="kw">public class</span> <span class="cls">GroupMessageHandler</span> : <span class="cls">IGroupHandler</span>
+{
+    <span class="kw">private readonly</span> <span class="cls">IGroupRepository</span> _groupRepo;
+    <span class="kw">private readonly</span> <span class="cls">IChatRepository</span> _chatRepo;
+
+    <span class="kw">public async</span> <span class="cls">Task</span> <span class="met">HandleGroupCreateAsync</span>(GroupCreateReceivedEventArgs args)
+    {
+        <span class="cm">// Save group to your database</span>
+        <span class="kw">await</span> _groupRepo.<span class="met">CreateAsync</span>(<span class="kw">new</span> <span class="cls">GroupEntity</span>
+        {
+            Id = args.GroupId.RawValue,
+            GroupName = args.GroupName,
+            CreatorDid = args.CreatorDid
+        });
+
+        <span class="cm">// Add members, create chat entity, fire UI events...</span>
+    }
+
+    <span class="kw">public async</span> <span class="cls">Task</span> <span class="met">HandleGroupMemberAddAsync</span>(GroupMemberAddReceivedEventArgs args)
+    {
+        <span class="cm">// Add new member to database</span>
+        <span class="kw">await</span> _groupRepo.<span class="met">AddMemberAsync</span>(args.GroupId.RawValue, args.NewMemberDid);
+    }
+
+    <span class="cm">// ... other handler methods</span>
+}</pre>
+
+  <div class="callout info">
+    <span class="callout-icon"><i class="fa-solid fa-circle-info"></i></span>
+    <div class="callout-body"><strong>Why inject a handler?</strong> The SDK is stateless - it doesn't have your database or UI. When a <code>GroupCreate</code> message arrives, the SDK decrypts it and calls your handler. Your handler saves it to the database so the group appears in the chat list.</div>
   </div>
 
   <div class="method-block">
@@ -27,7 +66,7 @@
       <span class="method-return">string</span>
     </div>
     <div class="method-body">
-      <p class="method-desc">Generates a unique group ID prefixed with "dc".</p>
+      <p class="method-desc">Generates a unique group ID prefixed with "dc". Call this before creating a group.</p>
       <pre><span class="kw">string</span> groupId = sdk.<span class="met">GenerateGroupId</span>(); <span class="cm">// e.g., "dc1a2b3c..."</span></pre>
     </div>
   </div>
