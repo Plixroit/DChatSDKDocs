@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>DChat SDK - Introduction</title>
+<title>DChat SDK Documentation</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
@@ -13,161 +13,57 @@
 
 <div class="layout-wrapper">
 <aside class="sidebar">
-  <a href="index.html" class="sidebar-logo">
+  <a href="#/intro" class="sidebar-logo" data-page="intro">
     <div class="logo-icon"><img src="Dchat.svg" alt="DChat"></div>
     <div><div class="logo-text">DChat SDK</div><div class="logo-sub">Developer Docs</div></div>
   </a>
   <nav>
     <div class="sidebar-section"><div class="sidebar-section-title">Overview</div>
-      <a href="index.html" class="active"><i class="nav-icon fa-solid fa-house"></i> Introduction</a>
-      <a href="getting-started.html"><i class="nav-icon fa-solid fa-rocket"></i> Getting Started</a>
-      <a href="configuration.html"><i class="nav-icon fa-solid fa-gear"></i> Configuration</a>
+      <a href="#/intro" data-page="intro"><i class="nav-icon fa-solid fa-house"></i> Introduction</a>
+      <a href="#/getting-started" data-page="getting-started"><i class="nav-icon fa-solid fa-rocket"></i> Getting Started</a>
+      <a href="#/configuration" data-page="configuration"><i class="nav-icon fa-solid fa-gear"></i> Configuration</a>
     </div>
     <div class="sidebar-section"><div class="sidebar-section-title">Core APIs</div>
-      <a href="identity.html"><i class="nav-icon fa-solid fa-id-card"></i> Identity &amp; Keys</a>
-      <a href="encryption.html"><i class="nav-icon fa-solid fa-lock"></i> Encryption</a>
-      <a href="messaging.html"><i class="nav-icon fa-solid fa-message"></i> Messaging</a>
-      <a href="groups.html"><i class="nav-icon fa-solid fa-users"></i> Groups</a>
-      <a href="streaming.html"><i class="nav-icon fa-solid fa-tower-broadcast"></i> Streaming</a>
+      <a href="#/identity" data-page="identity"><i class="nav-icon fa-solid fa-id-card"></i> Identity &amp; Keys</a>
+      <a href="#/encryption" data-page="encryption"><i class="nav-icon fa-solid fa-lock"></i> Encryption</a>
+      <a href="#/messaging" data-page="messaging"><i class="nav-icon fa-solid fa-message"></i> Messaging</a>
+      <a href="#/groups" data-page="groups"><i class="nav-icon fa-solid fa-users"></i> Groups</a>
+      <a href="#/streaming" data-page="streaming"><i class="nav-icon fa-solid fa-tower-broadcast"></i> Streaming</a>
     </div>
     <div class="sidebar-section"><div class="sidebar-section-title">Reference</div>
-      <a href="message-types.html"><i class="nav-icon fa-solid fa-list"></i> Message Types</a>
-      <a href="api-reference.html" class="sidebar-toggle"><i class="nav-icon fa-solid fa-code"></i> API Reference</a>
+      <a href="#/message-types" data-page="message-types"><i class="nav-icon fa-solid fa-list"></i> Message Types</a>
+      <div class="sidebar-item-with-toggle">
+        <a href="#/api-reference" data-page="api-reference"><i class="nav-icon fa-solid fa-code"></i> API Reference</a>
+        <button class="sidebar-chevron" aria-label="Toggle API Reference submenu">
+          <i class="fa-solid fa-chevron-down"></i>
+        </button>
+      </div>
       <div class="sidebar-submenu">
-        <a href="api-connection.html"><i class="nav-icon fa-solid fa-plug"></i> Connection</a>
-        <a href="api-identity.html"><i class="nav-icon fa-solid fa-id-card"></i> Identity</a>
-        <a href="api-chat-keys.html"><i class="nav-icon fa-solid fa-key"></i> Chat Keys</a>
-        <a href="api-encryption.html"><i class="nav-icon fa-solid fa-lock"></i> Encryption</a>
-        <a href="api-group-keys.html"><i class="nav-icon fa-solid fa-users-gear"></i> Group Keys</a>
-        <a href="api-messaging.html"><i class="nav-icon fa-solid fa-paper-plane"></i> Messaging</a>
-        <a href="api-group-messaging.html"><i class="nav-icon fa-solid fa-users"></i> Group Messaging</a>
-        <a href="api-group-control.html"><i class="nav-icon fa-solid fa-user-gear"></i> Group Control</a>
-        <a href="api-contact.html"><i class="nav-icon fa-solid fa-address-book"></i> Contacts</a>
-        <a href="api-presence.html"><i class="nav-icon fa-solid fa-circle-dot"></i> Presence</a>
-        <a href="api-media.html"><i class="nav-icon fa-solid fa-photo-film"></i> Media</a>
-        <a href="api-network.html"><i class="nav-icon fa-solid fa-network-wired"></i> Network</a>
-        <a href="api-events.html"><i class="nav-icon fa-solid fa-bolt"></i> Events</a>
+        <a href="#/api-connection" data-page="api-connection"><i class="nav-icon fa-solid fa-link"></i> Connection</a>
+        <a href="#/api-identity" data-page="api-identity"><i class="nav-icon fa-solid fa-fingerprint"></i> Identity</a>
+        <a href="#/api-chat-keys" data-page="api-chat-keys"><i class="nav-icon fa-solid fa-key"></i> Chat Keys</a>
+        <a href="#/api-encryption" data-page="api-encryption"><i class="nav-icon fa-solid fa-shield-halved"></i> Encryption</a>
+        <a href="#/api-group-keys" data-page="api-group-keys"><i class="nav-icon fa-solid fa-layer-group"></i> Group Keys</a>
+        <a href="#/api-messaging" data-page="api-messaging"><i class="nav-icon fa-solid fa-comment"></i> Messaging</a>
+        <a href="#/api-group-messaging" data-page="api-group-messaging"><i class="nav-icon fa-solid fa-comments"></i> Group Messaging</a>
+        <a href="#/api-group-control" data-page="api-group-control"><i class="nav-icon fa-solid fa-user-plus"></i> Group Control</a>
+        <a href="#/api-contact" data-page="api-contact"><i class="nav-icon fa-solid fa-user-tag"></i> Contacts</a>
+        <a href="#/api-presence" data-page="api-presence"><i class="nav-icon fa-solid fa-eye"></i> Presence</a>
+        <a href="#/api-media" data-page="api-media"><i class="nav-icon fa-solid fa-image"></i> Media</a>
+        <a href="#/api-network" data-page="api-network"><i class="nav-icon fa-solid fa-server"></i> Network</a>
+        <a href="#/api-events" data-page="api-events"><i class="nav-icon fa-solid fa-bell"></i> Events</a>
       </div>
     </div>
   </nav>
 </aside>
 
-<main class="main">
-  <div class="topbar">
-    <div class="breadcrumb">DChat SDK <span>></span> Introduction</div>
-  </div>
-
-  <div class="page-header">
-    <h1>DChat SDK</h1>
-    <p class="lead">A self-sovereign, end-to-end encrypted messaging SDK built on a Cosmos-based blockchain. No phone numbers, no central servers - just cryptographic identities and decentralised delivery.</p>
-  </div>
-
-  <!-- Hero stats -->
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:2.5rem">
-    <div class="card"><div class="card-icon"><i class="fa-solid fa-lock"></i></div><div class="card-title">E2EE by Default</div><div class="card-desc">Every message is encrypted with the recipient's Secp256k1 key before leaving the device.</div></div>
-    <div class="card"><div class="card-icon"><i class="fa-solid fa-link"></i></div><div class="card-title">Blockchain Identity</div><div class="card-desc">Identities are BIP39/BIP44 key pairs registered on-chain - no email, no phone required.</div></div>
-    <div class="card"><div class="card-icon"><i class="fa-solid fa-tower-broadcast"></i></div><div class="card-title">gRPC Streaming</div><div class="card-desc">Bidirectional gRPC stream with automatic reconnect, ACK queue, and offline message retry.</div></div>
-  </div>
-
-  <div class="section">
-    <h2>What is the DChat SDK?</h2>
-    <p><code>DChatSDK</code> is a .NET class library that gives your application a single entry point - <code>IDChatSDKClient</code> - to manage the full lifecycle of decentralised, encrypted messaging:</p>
-    <ul style="color:var(--text-muted);padding-left:1.4rem;line-height:2">
-      <li>Generate and restore blockchain identities from a BIP39 seed phrase.</li>
-      <li>Encrypt and decrypt messages with rotating E2EE key pairs (forward secrecy).</li>
-      <li>Send typed messages: text, images, video, audio, files, albums, location, and more.</li>
-      <li>Manage group chats with symmetric sender keys and automatic key rotation.</li>
-      <li>WebRTC peer-to-peer calls without a signalling server.</li>
-      <li>Stream messages in real time over a persistent gRPC connection.</li>
-    </ul>
-  </div>
-
-  <div class="section">
-    <h2>Architecture Overview</h2>
-    <div class="infographic">
-      <div class="infographic-title">System Architecture</div>
-      
-      <!-- Top Layer: Your Application -->
-      <div class="arch-layer" style="margin-bottom: 1rem;">
-        <div class="arch-box" style="max-width: 400px; margin: 0 auto;">
-          <div class="arch-box-title"><i class="fa-solid fa-laptop-code" style="margin-right: 8px; color: var(--green);"></i>Your Application</div>
-          <div class="arch-box-subtitle">MAUI - .NET Console - Blazor - Xamarin</div>
-        </div>
-      </div>
-      
-      <!-- Connector -->
-      <div class="arch-connector" style="margin: 0 auto;">
-        <div class="arch-arrow vertical"></div>
-        <div class="arch-label">IDChatSDKClient</div>
-        <div class="arch-arrow vertical"></div>
-      </div>
-      
-      <!-- Middle Layer: DChatSDKClient -->
-      <div class="arch-layer" style="margin-bottom: 1rem;">
-        <div class="arch-box highlight" style="max-width: 500px; margin: 0 auto;">
-          <div class="arch-box-title"><i class="fa-solid fa-cube" style="margin-right: 8px;"></i>DChatSDKClient</div>
-          <div class="arch-services">
-            <div class="arch-service"><i class="fa-solid fa-id-card"></i> Identity</div>
-            <div class="arch-service"><i class="fa-solid fa-lock"></i> Crypto</div>
-            <div class="arch-service"><i class="fa-solid fa-message"></i> Messaging</div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Connector -->
-      <div class="arch-connector" style="margin: 0 auto;">
-        <div class="arch-arrow vertical"></div>
-        <div class="arch-label">gRPC Stream</div>
-        <div class="arch-arrow vertical"></div>
-      </div>
-      
-      <!-- Bottom Layer: GrpcStreamingService + Node -->
-      <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: center; max-width: 600px; margin: 0 auto;">
-        <div class="arch-box">
-          <div class="arch-box-title"><i class="fa-solid fa-tower-broadcast" style="margin-right: 8px; color: var(--accent2);"></i>GrpcStreamingService</div>
-          <div class="arch-box-subtitle">Bidirectional stream - ACK queue</div>
-        </div>
-        
-        <div class="arch-connector">
-          <div class="arch-arrow"></div>
-          <div class="arch-label">HTTPS</div>
-          <div class="arch-arrow" style="transform: rotate(180deg);"></div>
-        </div>
-        
-        <div class="arch-box">
-          <div class="arch-box-title"><i class="fa-solid fa-server" style="margin-right: 8px; color: var(--orange);"></i>DChat Node</div>
-          <div class="arch-box-subtitle">CometBFT - Cosmos SDK - Middleware</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <h2>Quick Navigation</h2>
-    <div class="cards">
-      <a class="card" href="getting-started.html"><div class="card-icon"><i class="fa-solid fa-rocket"></i></div><div class="card-title">Getting Started</div><div class="card-desc">Install, initialise, and send your first message in 5 minutes.</div></a>
-      <a class="card" href="configuration.html"><div class="card-icon"><i class="fa-solid fa-gear"></i></div><div class="card-title">Configuration</div><div class="card-desc">DChatSdkOptions builder, nodes, key rotation policies.</div></a>
-      <a class="card" href="identity.html"><div class="card-icon"><i class="fa-solid fa-id-card"></i></div><div class="card-title">Identity &amp; Keys</div><div class="card-desc">Seed phrases, blockchain registration, key storage.</div></a>
-      <a class="card" href="encryption.html"><div class="card-icon"><i class="fa-solid fa-lock"></i></div><div class="card-title">Encryption</div><div class="card-desc">E2EE, symmetric group keys, chat key rotation.</div></a>
-      <a class="card" href="messaging.html"><div class="card-icon"><i class="fa-solid fa-message"></i></div><div class="card-title">Messaging</div><div class="card-desc">Send text, media, files, albums, and typed payloads.</div></a>
-      <a class="card" href="groups.html"><div class="card-icon"><i class="fa-solid fa-users"></i></div><div class="card-title">Groups</div><div class="card-desc">Group creation, member management, sender key distribution.</div></a>
-      <a class="card" href="streaming.html"><div class="card-icon"><i class="fa-solid fa-tower-broadcast"></i></div><div class="card-title">Streaming</div><div class="card-desc">gRPC stream lifecycle, events, failed message retry.</div></a>
-      <a class="card" href="message-types.html"><div class="card-icon"><i class="fa-solid fa-list"></i></div><div class="card-title">Message Types</div><div class="card-desc">Full MessageContentType enum reference.</div></a>
-      <a class="card" href="api-reference.html"><div class="card-icon"><i class="fa-solid fa-code"></i></div><div class="card-title">API Reference</div><div class="card-desc">Complete IDChatSDKClient interface documentation.</div></a>
-    </div>
-  </div>
-
-  <div class="page-nav">
-    <div></div>
-    <a href="getting-started.html" class="next">
-      <span class="nav-dir">Next -></span>
-      <span class="nav-title">Getting Started</span>
-    </a>
-  </div>
+<main class="main" id="content">
+  <!-- Content loaded dynamically here -->
 </main>
 </div>
-  <script src="_reveal.js"></script>
-<script src="_sidebar.js"></script>
+
+<script src="_reveal.js"></script>
+<script src="_app.js"></script>
 </body>
 </html>
 

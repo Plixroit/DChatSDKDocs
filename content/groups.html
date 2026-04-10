@@ -94,20 +94,17 @@
   <div class="method-block">
     <div class="method-header">
       <div class="method-sig">
-        <span class="ret">Task&lt;bool&gt;</span> <span class="name">SendGroupTextMessageAsync</span>(...)
+        <span class="ret">Task&lt;bool&gt;</span> <span class="name">SendGroupMessageAsync</span>(ConversationId.Group groupId, MessagePayload payload, string senderDid)
       </div>
     </div>
     <div class="method-body">
-      <p class="method-desc">Encrypts a text message with the sender's symmetric key and delivers it to all group members. Internally calls <code>IGroupMemberProvider.GetGroupMembersAsync</code> to resolve the delivery list.</p>
-      <table class="param-table">
-        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
-        <tr><td>groupId</td><td>string</td><td>Group identifier.</td></tr>
-        <tr><td>content</td><td>string</td><td>Message text.</td></tr>
-        <tr><td>senderDid</td><td>string</td><td>DID of the sender.</td></tr>
-        <tr><td>senderWalletAddress</td><td>string</td><td>Sender's wallet address for gRPC auth.</td></tr>
-        <tr><td>chatId</td><td>string</td><td>Chat ID (same as groupId for groups).</td></tr>
-        <tr><td>replyToMessageId</td><td>string?</td><td>Optional reply reference.</td></tr>
-      </table>
+      <p class="method-desc">Sends any typed payload to all group members using sender-key encryption. For text messages, construct a <code>MessagePayload</code> containing a <code>TextMessageData</code> and pass it here.</p>
+      <pre><span class="kw">var</span> payload = <span class="kw">new</span> <span class="cls">MessagePayload</span>
+{
+    ContentType = <span class="cls">MessageContentType</span>.Text,
+    Data = <span class="kw">new</span> <span class="cls">TextMessageData</span> { Content = <span class="str">"Hello group!"</span> }
+};
+<span class="kw">await</span> sdk.<span class="met">SendGroupMessageAsync</span>(<span class="kw">new</span> <span class="cls">ConversationId</span>.Group(groupId), payload, senderDid);</pre>
     </div>
   </div>
 

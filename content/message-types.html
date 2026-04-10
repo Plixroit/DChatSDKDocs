@@ -12,60 +12,70 @@
   <h2><i class="fa-solid fa-message"></i> Content Messages</h2>
   <div class="type-grid">
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-font"></i></div>
       <span class="tc-val">0</span>
       <div class="tc-name">Text</div>
       <div class="tc-desc">Plain UTF-8 text message with optional formatting.</div>
       <div class="tc-fields">Data type: <code>TextMessageData</code>  Fields: <code>Content</code>, <code>FormattedContent</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-image"></i></div>
       <span class="tc-val">1</span>
       <div class="tc-name">Image</div>
       <div class="tc-desc">Single image stored on IPFS. Includes thumbnail, dimensions, and optional caption.</div>
       <div class="tc-fields">Data type: <code>ImageMessageData</code>  Fields: <code>IpfsCid</code>, <code>ThumbnailCid</code>, <code>Width</code>, <code>Height</code>, <code>Caption</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-microphone"></i></div>
       <span class="tc-val">2</span>
       <div class="tc-name">Audio</div>
       <div class="tc-desc">Voice message or audio clip stored on IPFS.</div>
       <div class="tc-fields">Data type: <code>AudioMessageData</code>  Fields: <code>IpfsCid</code>, <code>DurationSeconds</code>, <code>WaveformData</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-video"></i></div>
       <span class="tc-val">3</span>
       <div class="tc-name">Video</div>
       <div class="tc-desc">Video with thumbnail stored on IPFS.</div>
       <div class="tc-fields">Data type: <code>VideoMessageData</code>  Fields: <code>IpfsCid</code>, <code>ThumbnailCid</code>, <code>Width</code>, <code>Height</code>, <code>DurationSeconds</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-file"></i></div>
       <span class="tc-val">4</span>
       <div class="tc-name">File</div>
       <div class="tc-desc">Arbitrary file attachment stored on IPFS.</div>
       <div class="tc-fields">Data type: <code>FileMessageData</code>  Fields: <code>IpfsCid</code>, <code>Filename</code>, <code>MimeType</code>, <code>FileSizeBytes</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-location-dot"></i></div>
       <span class="tc-val">5</span>
       <div class="tc-name">Location</div>
       <div class="tc-desc">GPS coordinates with optional venue name and address.</div>
       <div class="tc-fields">Data type: <code>LocationMessageData</code>  Fields: <code>Latitude</code>, <code>Longitude</code>, <code>VenueName</code>, <code>Address</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-face-smile"></i></div>
       <span class="tc-val">7</span>
       <div class="tc-name">Sticker</div>
       <div class="tc-desc">Animated or static sticker from a sticker pack.</div>
       <div class="tc-fields">Data type: <code>StickerMessageData</code>  Fields: <code>StickerId</code>, <code>PackId</code>, <code>IpfsCid</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-film"></i></div>
       <span class="tc-val">46</span>
       <div class="tc-name">Gif</div>
       <div class="tc-desc">Animated GIF stored on IPFS or linked via URL.</div>
       <div class="tc-fields">Data type: <code>ImageMessageData</code> (with <code>IsAnimated = true</code>)</div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-images"></i></div>
       <span class="tc-val">60</span>
       <div class="tc-name">Album</div>
       <div class="tc-desc">Multiple images sent as a single grouped message.</div>
       <div class="tc-fields">Data type: <code>AlbumMessageData</code>  Fields: <code>Images[]</code>, <code>Caption</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-square-poll-vertical"></i></div>
       <span class="tc-val">47</span>
       <div class="tc-name">Poll</div>
       <div class="tc-desc">Interactive poll with multiple choice options.</div>
@@ -79,36 +89,42 @@
   <h2><i class="fa-solid fa-heart"></i> Social Features</h2>
   <div class="type-grid">
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-heart"></i></div>
       <span class="tc-val">37</span>
       <div class="tc-name">MessageReaction</div>
       <div class="tc-desc">Emoji reaction to a specific message.</div>
       <div class="tc-fields">Data type: <code>MessageReactionMessageData</code>  Fields: <code>TargetMessageId</code>, <code>Emoji</code>, <code>IsRemoval</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-pen"></i></div>
       <span class="tc-val">38</span>
       <div class="tc-name">MessageEdit</div>
       <div class="tc-desc">Replaces the content of a previously sent message.</div>
       <div class="tc-fields">Data type: <code>MessageEditMessageData</code>  Fields: <code>TargetMessageId</code>, <code>NewContent</code>, <code>EditedAt</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-trash"></i></div>
       <span class="tc-val">39</span>
       <div class="tc-name">MessageDelete</div>
       <div class="tc-desc">Requests deletion of a sent message on all devices.</div>
       <div class="tc-fields">Data type: <code>MessageDeleteMessageData</code>  Fields: <code>TargetMessageId</code>, <code>DeleteForEveryone</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-comments"></i></div>
       <span class="tc-val">40</span>
       <div class="tc-name">ThreadReply</div>
       <div class="tc-desc">A reply that starts or continues a message thread.</div>
       <div class="tc-fields">Data type: <code>ThreadReplyMessageData</code>  Fields: <code>ThreadId</code>, <code>Content</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-share"></i></div>
       <span class="tc-val">41</span>
       <div class="tc-name">ForwardMessage</div>
       <div class="tc-desc">A message forwarded from another conversation.</div>
       <div class="tc-fields">Carried in <code>MessagePayload.IsForwarded</code> + <code>ForwardedFromDid</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-thumbtack"></i></div>
       <span class="tc-val">42</span>
       <div class="tc-name">MessagePin</div>
       <div class="tc-desc">Pins or unpins a message in the conversation.</div>
@@ -123,48 +139,56 @@
   <p>These types are sent via <code>SendImmediateAsync</code> (fire-and-forget, no ACK queue) to minimise call setup latency.</p>
   <div class="type-grid">
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-phone"></i></div>
       <span class="tc-val">19</span>
       <div class="tc-name">CallOffer</div>
       <div class="tc-desc">Initiates a WebRTC call. Contains the SDP offer.</div>
       <div class="tc-fields">Data type: <code>CallOfferMessageData</code>  Fields: <code>CallId</code>, <code>SdpOffer</code>, <code>IsVideo</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-phone"></i></div>
       <span class="tc-val">20</span>
       <div class="tc-name">CallAnswer</div>
       <div class="tc-desc">Accepts a call. Contains the SDP answer.</div>
       <div class="tc-fields">Data type: <code>CallAnswerMessageData</code>  Fields: <code>CallId</code>, <code>SdpAnswer</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-bell"></i></div>
       <span class="tc-val">59</span>
       <div class="tc-name">CallRinging</div>
       <div class="tc-desc">Recipient device is ringing  sent as early indication before answer.</div>
       <div class="tc-fields">Data type: <code>CallRingingMessageData</code>  Fields: <code>CallId</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-signal"></i></div>
       <span class="tc-val">21</span>
       <div class="tc-name">ICECandidate</div>
       <div class="tc-desc">WebRTC ICE candidate for NAT traversal negotiation.</div>
       <div class="tc-fields">Data type: <code>ICECandidateMessageData</code>  Fields: <code>CallId</code>, <code>Candidate</code>, <code>SdpMid</code>, <code>SdpMLineIndex</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-network-wired"></i></div>
       <span class="tc-val">22</span>
       <div class="tc-name">IPExchange</div>
       <div class="tc-desc">Direct IP address hint for peer-to-peer connectivity.</div>
       <div class="tc-fields">Data type: <code>IPExchangeMessageData</code>  Fields: <code>CallId</code>, <code>IpAddress</code>, <code>Port</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-phone-slash"></i></div>
       <span class="tc-val">23</span>
       <div class="tc-name">CallTermination</div>
       <div class="tc-desc">Ends an active call. Includes the termination reason.</div>
       <div class="tc-fields">Data type: <code>CallTerminationMessageData</code>  Fields: <code>CallId</code>, <code>Reason</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-users"></i></div>
       <span class="tc-val">24</span>
       <div class="tc-name">GroupCallUpdate</div>
       <div class="tc-desc">Status update for a group call (member joined, left, or call ended).</div>
       <div class="tc-fields">Data type: <code>GroupCallUpdateMessageData</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-signal"></i></div>
       <span class="tc-val">25</span>
       <div class="tc-name">CallQuality</div>
       <div class="tc-desc">Real-time call quality metrics report (packet loss, jitter, latency).</div>
@@ -178,42 +202,49 @@
   <h2><i class="fa-solid fa-handshake"></i> Contact &amp; Presence</h2>
   <div class="type-grid">
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-user-plus"></i></div>
       <span class="tc-val">15</span>
       <div class="tc-name">ContactRequest</div>
       <div class="tc-desc">Initiates a contact request. Contains sender's public key and profile stub.</div>
       <div class="tc-fields">Data type: <code>ContactRequestMessageData</code>  Fields: <code>SenderDid</code>, <code>SenderPublicKey</code>, <code>Message</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-user-check"></i></div>
       <span class="tc-val">16</span>
       <div class="tc-name">ContactResponse</div>
       <div class="tc-desc">Accepts or rejects a contact request. On accept, returns the responder's chat public key.</div>
       <div class="tc-fields">Data type: <code>ContactResponseMessageData</code>  Fields: <code>Accepted</code>, <code>ChatPublicKey</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-id-card"></i></div>
       <span class="tc-val">17</span>
       <div class="tc-name">ProfileUpdate</div>
       <div class="tc-desc">Pushes latest profile data (name, avatar CID, chat public key) to a contact.</div>
       <div class="tc-fields">Data type: <code>ProfileUpdateMessageData</code>  Fields: <code>Username</code>, <code>DisplayName</code>, <code>AvatarIpfsCid</code>, <code>ChatPublicKey</code>, <code>UpdatedFields</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-id-card"></i></div>
       <span class="tc-val">18</span>
       <div class="tc-name">ProfileRequest</div>
       <div class="tc-desc">Asks a contact to re-send their current profile.</div>
       <div class="tc-fields">Data type: <code>ProfileRequestMessageData</code>  Fields: <code>RequestedFields</code>, <code>RequestReason</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-eye"></i></div>
       <span class="tc-val">12</span>
       <div class="tc-name">ContactPresenceRequest</div>
       <div class="tc-desc">Pings a contact for their current online/away status.</div>
       <div class="tc-fields">Data type: <code>ContactPresenceRequestMessageData</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-eye"></i></div>
       <span class="tc-val">13</span>
       <div class="tc-name">ContactPresenceResponse</div>
       <div class="tc-desc">Responds with current presence state (online, away, DND).</div>
       <div class="tc-fields">Data type: <code>ContactPresenceResponseMessageData</code>  Fields: <code>Status</code>, <code>LastSeen</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-keyboard"></i></div>
       <span class="tc-val">14</span>
       <div class="tc-name">TypingIndicator</div>
       <div class="tc-desc">Notifies the recipient that the sender is currently composing a message.</div>
@@ -227,12 +258,14 @@
   <h2><i class="fa-solid fa-key"></i> Key Management</h2>
   <div class="type-grid">
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-sync"></i></div>
       <span class="tc-val">10</span>
       <div class="tc-name">KeyRotation</div>
       <div class="tc-desc">Notifies a contact of a new chat public key after E2EE key rotation.</div>
       <div class="tc-fields">Data type: <code>KeyRotationMessageData</code>  Fields: <code>NewChatPublicKey</code>, <code>KeyGeneration</code>, <code>Reason</code></div>
     </div>
     <div class="type-card">
+      <div class="tc-icon"><i class="fa-solid fa-shield-halved"></i></div>
       <span class="tc-val">11</span>
       <div class="tc-name">KeyVerification</div>
       <div class="tc-desc">Challenge/response for safety-number verification (QR code scanning).</div>

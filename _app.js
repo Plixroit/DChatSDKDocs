@@ -65,6 +65,13 @@
       link.addEventListener('click', (e) => {
         e.preventDefault();
         const page = link.dataset.page;
+
+        // If clicking API Reference, expand submenu
+        if (API_PAGES.includes(page)) {
+          expandSubmenu();
+          sessionStorage.setItem('sidebarCollapsed', 'false');
+        }
+
         navigateTo(page);
       });
     });
@@ -103,13 +110,14 @@
     try {
       const response = await fetch(`${CONTENT_DIR}${page}.html`);
       if (!response.ok) throw new Error(`Page not found: ${page}`);
-      
+
       const html = await response.text();
       contentEl.innerHTML = html;
-      
-      // Scroll to top
+
+      // Scroll to top (both content container and window)
       contentEl.scrollTop = 0;
-      
+      window.scrollTo(0, 0);
+
       // Re-initialize reveal animations
       if (window.initRevealAnimations) {
         window.initRevealAnimations();
@@ -166,11 +174,10 @@
 
     const isApiPage = API_PAGES.includes(page);
     const wasCollapsed = sessionStorage.getItem('sidebarCollapsed') === 'true';
-    
+
     // Auto-expand if on API page, unless user explicitly collapsed
     if (isApiPage && !wasCollapsed) {
-      submenuEl.classList.add('expanded');
-      chevronBtn.classList.add('expanded');
+      expandSubmenu();
     }
   }
 
@@ -179,16 +186,22 @@
     if (!submenuEl || !chevronBtn) return;
 
     const isExpanded = submenuEl.classList.contains('expanded');
-    
+
     if (isExpanded) {
       submenuEl.classList.remove('expanded');
       chevronBtn.classList.remove('expanded');
       sessionStorage.setItem('sidebarCollapsed', 'true');
     } else {
-      submenuEl.classList.add('expanded');
-      chevronBtn.classList.add('expanded');
+      expandSubmenu();
       sessionStorage.setItem('sidebarCollapsed', 'false');
     }
+  }
+
+  // Expand submenu
+  function expandSubmenu() {
+    if (!submenuEl || !chevronBtn) return;
+    submenuEl.classList.add('expanded');
+    chevronBtn.classList.add('expanded');
   }
 
   // Handle hash change (browser back/forward)

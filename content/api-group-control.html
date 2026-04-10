@@ -104,16 +104,16 @@
       <p class="method-desc">Sends a group admin update message (promote/demote) to all members.</p>
       <table class="param-table">
         <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
-        <tr><td>groupId</td><td>string</td><td>Group identifier</td></tr>
+        <tr><td>groupId</td><td>ConversationId.Group</td><td>Typed group identifier</td></tr>
         <tr><td>requesterDid</td><td>string</td><td>Requester's DID</td></tr>
         <tr><td>targetMemberDid</td><td>string</td><td>Target member's DID</td></tr>
         <tr><td>promoteToAdmin</td><td>bool</td><td>True to promote, false to demote</td></tr>
         <tr><td>stateVersion</td><td>int</td><td>Current state version</td></tr>
-        <tr><td>memberDids</td><td>List&lt;string&gt;</td><td>All member DIDs for broadcast</td></tr>
+        <tr><td>memberDids</td><td>string[]</td><td>All member DIDs for broadcast</td></tr>
       </table>
       <pre><span class="kw">await</span> sdk.<span class="met">SendGroupAdminUpdateAsync</span>(
-    groupId, requesterDid, targetMemberDid, promoteToAdmin: <span class="kw">true</span>, 
-    stateVersion, memberDids
+    <span class="kw">new</span> <span class="cls">ConversationId</span>.Group(groupId), requesterDid, targetMemberDid,
+    promoteToAdmin: <span class="kw">true</span>, stateVersion, memberDids
 );</pre>
     </div>
   </div>
@@ -131,13 +131,13 @@
       <p class="method-desc">Sends a group name change message to all members.</p>
       <table class="param-table">
         <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
-        <tr><td>groupId</td><td>string</td><td>Group identifier</td></tr>
+        <tr><td>groupId</td><td>ConversationId.Group</td><td>Typed group identifier</td></tr>
         <tr><td>adminDid</td><td>string</td><td>Admin's DID</td></tr>
         <tr><td>newName</td><td>string</td><td>New group name</td></tr>
         <tr><td>stateVersion</td><td>int</td><td>Current state version</td></tr>
-        <tr><td>memberDids</td><td>List&lt;string&gt;</td><td>All member DIDs</td></tr>
+        <tr><td>memberDids</td><td>string[]</td><td>All member DIDs</td></tr>
       </table>
-      <pre><span class="kw">await</span> sdk.<span class="met">SendGroupNameChangeAsync</span>(groupId, adminDid, newName, stateVersion, memberDids);</pre>
+      <pre><span class="kw">await</span> sdk.<span class="met">SendGroupNameChangeAsync</span>(<span class="kw">new</span> <span class="cls">ConversationId</span>.Group(groupId), adminDid, newName, stateVersion, memberDids);</pre>
     </div>
   </div>
 
@@ -148,7 +148,7 @@
     </div>
     <div class="method-body">
       <p class="method-desc">Sends a group description change message to all members.</p>
-      <pre><span class="kw">await</span> sdk.<span class="met">SendGroupDescriptionChangeAsync</span>(groupId, adminDid, newDescription, stateVersion, memberDids);</pre>
+      <pre><span class="kw">await</span> sdk.<span class="met">SendGroupDescriptionChangeAsync</span>(<span class="kw">new</span> <span class="cls">ConversationId</span>.Group(groupId), adminDid, newDescription, stateVersion, memberDids);</pre>
     </div>
   </div>
 
@@ -159,7 +159,7 @@
     </div>
     <div class="method-body">
       <p class="method-desc">Sends a group photo change message to all members.</p>
-      <pre><span class="kw">await</span> sdk.<span class="met">SendGroupPhotoChangeAsync</span>(groupId, adminDid, newPhotoCid, stateVersion, memberDids);</pre>
+      <pre><span class="kw">await</span> sdk.<span class="met">SendGroupPhotoChangeAsync</span>(<span class="kw">new</span> <span class="cls">ConversationId</span>.Group(groupId), adminDid, newPhotoCid, stateVersion, memberDids);</pre>
     </div>
   </div>
 
@@ -170,7 +170,7 @@
     </div>
     <div class="method-body">
       <p class="method-desc">Sends a group photo remove message to all members.</p>
-      <pre><span class="kw">await</span> sdk.<span class="met">SendGroupPhotoRemoveAsync</span>(groupId, adminDid, memberDids);</pre>
+      <pre><span class="kw">await</span> sdk.<span class="met">SendGroupPhotoRemoveAsync</span>(<span class="kw">new</span> <span class="cls">ConversationId</span>.Group(groupId), adminDid, memberDids);</pre>
     </div>
   </div>
 </div>
@@ -187,11 +187,11 @@
       <p class="method-desc">Sends a metadata request message to a specific group member.</p>
       <table class="param-table">
         <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
-        <tr><td>groupId</td><td>string</td><td>Group identifier</td></tr>
+        <tr><td>groupId</td><td>ConversationId.Group</td><td>Typed group identifier</td></tr>
         <tr><td>requesterDid</td><td>string</td><td>Requester's DID</td></tr>
         <tr><td>recipientDid</td><td>string</td><td>Recipient's DID</td></tr>
       </table>
-      <pre><span class="kw">await</span> sdk.<span class="met">SendGroupMetadataRequestAsync</span>(groupId, requesterDid, recipientDid);</pre>
+      <pre><span class="kw">await</span> sdk.<span class="met">SendGroupMetadataRequestAsync</span>(<span class="kw">new</span> <span class="cls">ConversationId</span>.Group(groupId), requesterDid, recipientDid);</pre>
     </div>
   </div>
 
@@ -204,13 +204,16 @@
       <p class="method-desc">Attempts to recover group metadata using fallback strategies.</p>
       <table class="param-table">
         <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
-        <tr><td>groupId</td><td>string</td><td>Group identifier</td></tr>
+        <tr><td>groupId</td><td>ConversationId.Group</td><td>Typed group identifier</td></tr>
         <tr><td>requesterDid</td><td>string</td><td>Requester's DID</td></tr>
-        <tr><td>lastStateCid</td><td>string?</td><td>Last known state CID</td></tr>
-        <tr><td>knownMemberDids</td><td>List&lt;string&gt;</td><td>Known member DIDs</td></tr>
-        <tr><td>knownAdminDids</td><td>List&lt;string&gt;</td><td>Known admin DIDs</td></tr>
+        <tr><td>lastStateCid</td><td>string?</td><td>Last known state CID (default: null)</td></tr>
+        <tr><td>knownMemberDids</td><td>List&lt;string&gt;?</td><td>Known member DIDs (default: null)</td></tr>
+        <tr><td>knownAdminDids</td><td>List&lt;string&gt;?</td><td>Known admin DIDs (default: null)</td></tr>
       </table>
-      <pre><span class="kw">await</span> sdk.<span class="met">RecoverGroupMetadataAsync</span>(groupId, requesterDid, lastStateCid, knownMemberDids, knownAdminDids);</pre>
+      <pre><span class="kw">await</span> sdk.<span class="met">RecoverGroupMetadataAsync</span>(
+    <span class="kw">new</span> <span class="cls">ConversationId</span>.Group(groupId), requesterDid,
+    lastStateCid, knownMemberDids, knownAdminDids
+);</pre>
     </div>
   </div>
 </div>

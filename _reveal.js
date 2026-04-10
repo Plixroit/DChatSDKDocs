@@ -43,6 +43,7 @@
     const selectors = [
       '.section',
       '.card',
+      '.type-card',
       '.method-block',
       'pre',
       '.callout',

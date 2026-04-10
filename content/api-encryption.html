@@ -12,6 +12,11 @@
   <p>These methods provide direct access to encryption primitives. In most cases, you should use the high-level messaging methods (e.g., <code>SendTextMessageAsync</code>) which handle encryption automatically. Use these when implementing custom protocols or debugging.</p>
 </div>
 
+<div class="callout info">
+  <span class="callout-icon"><i class="fa-solid fa-lightbulb"></i></span>
+  <div class="callout-body"><strong>Automatic Encryption:</strong> The SDK automatically encrypts all outgoing messages and decrypts all incoming messages. You typically never need to call these methods directly. When you call <code>SendTextMessageAsync</code>, <code>SendMediaAsync</code>, or any other Send* method, encryption is handled internally using the recipient's chat public key. Similarly, received messages are automatically decrypted before being delivered via the <code>OnMessageReceived</code> event.</div>
+</div>
+
 <div class="section">
   <h2>ECIES Encryption (1:1)</h2>
   
