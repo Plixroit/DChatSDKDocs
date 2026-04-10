@@ -10,8 +10,62 @@
 <div class="section">
   <h2>Overview</h2>
   <p>Group messages use sender-key encryption: each member has their own symmetric key that they distribute to all other members via E2E encrypted envelopes. This allows efficient broadcast encryption without re-keying on member changes.</p>
-  <div class="callout callout-info">
-    <strong>ConversationId.Group</strong> — All group methods take a <code>ConversationId.Group</code> typed identifier, not a plain <code>string</code>. Construct one with <code>new ConversationId.Group(groupId)</code> or use the value directly if you already have one.
+
+  <div class="infographic">
+    <div class="infographic-title">Sender-Key Encryption Flow</div>
+
+    <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-top: 1.5rem;">
+      <!-- Sender generates key -->
+      <div class="arch-box" style="max-width: 600px; margin: 0 auto;">
+        <div class="arch-box-title"><i class="fa-solid fa-key" style="margin-right: 8px; color: var(--green);"></i>1. Sender Generates Sender Key</div>
+        <div class="arch-box-subtitle">Each member creates a unique symmetric key for their messages</div>
+      </div>
+
+      <!-- Distribution -->
+      <div style="display: flex; justify-content: center;">
+        <div class="arch-connector">
+          <div class="arch-arrow vertical"></div>
+          <div class="arch-label">E2E Encrypted</div>
+          <div class="arch-arrow vertical"></div>
+        </div>
+      </div>
+
+      <!-- Key distribution to members -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; max-width: 600px; margin: 0 auto;">
+        <div class="arch-box" style="text-align: center;">
+          <div class="arch-box-title"><i class="fa-solid fa-user" style="color: var(--accent);"></i></div>
+          <div class="arch-box-subtitle">Member A</div>
+        </div>
+        <div class="arch-box" style="text-align: center;">
+          <div class="arch-box-title"><i class="fa-solid fa-user" style="color: var(--accent2);"></i></div>
+          <div class="arch-box-subtitle">Member B</div>
+        </div>
+        <div class="arch-box" style="text-align: center;">
+          <div class="arch-box-title"><i class="fa-solid fa-user" style="color: var(--cyan);"></i></div>
+          <div class="arch-box-subtitle">Member C</div>
+        </div>
+      </div>
+
+      <!-- Broadcast -->
+      <div style="display: flex; justify-content: center;">
+        <div class="arch-connector">
+          <div class="arch-arrow vertical"></div>
+          <div class="arch-label">Single Encrypt</div>
+          <div class="arch-arrow vertical"></div>
+        </div>
+      </div>
+
+      <!-- Result -->
+      <div class="arch-box highlight" style="max-width: 600px; margin: 0 auto;">
+        <div class="arch-box-title"><i class="fa-solid fa-bolt" style="margin-right: 8px; color: var(--cyan);"></i>2. Broadcast to All Members</div>
+        <div class="arch-box-subtitle">One encryption, multiple recipients - efficient group messaging</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout info" style="margin-top: 1.5rem;">
+    <span class="callout-icon"><i class="fa-solid fa-circle-info"></i></span>
+    <div class="callout-body"><strong>ConversationId.Group</strong> - All group methods take a <code>ConversationId.Group</code> typed identifier, not a plain <code>string</code>. Construct one with <code>new ConversationId.Group(groupId)</code> or use the value directly if you already have one.</div>
   </div>
 </div>
 
