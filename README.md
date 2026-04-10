@@ -1,14 +1,10 @@
-<div align="center">
-  <img src="Dchat.svg" alt="DChat Logo" width="120" height="120">
-  
-  # DChat SDK Documentation
-  
-  **A self-sovereign, end-to-end encrypted messaging SDK built on Cosmos blockchain**
-  
-  [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-  [![.NET](https://img.shields.io/badge/.NET-8.0-512BD4.svg)](https://dotnet.microsoft.com/)
-  [![Cosmos SDK](https://img.shields.io/badge/Cosmos-SDK-2E3256.svg)](https://cosmos.network/)
-</div>
+# ![DChat Logo](Dchat.svg) DChat SDK Documentation
+
+**A self-sovereign, end-to-end encrypted messaging SDK built on Cosmos blockchain**
+
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![.NET](https://img.shields.io/badge/.NET-8.0-512BD4.svg)](https://dotnet.microsoft.com/)
+[![Cosmos SDK](https://img.shields.io/badge/Cosmos-SDK-2E3256.svg)](https://cosmos.network/)
 
 ---
 
@@ -128,6 +124,4 @@ Contributions are welcome! Please read our contributing guidelines before submit
 
 ---
 
-<div align="center">
-  <sub>Built with for decentralized communication</sub>
-</div>
+*Built with for decentralized communication*
