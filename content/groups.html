@@ -92,16 +92,22 @@
   <h2>Creating a Group</h2>
   <p>Groups are created by an admin who broadcasts a <code>GroupCreateMessageData</code> to all initial members. The SDK handles sender-key generation and distribution automatically.</p>
 
-  <h3>Step-by-Step Guide</h3>
+  <div class="callout info">
+    <span class="callout-icon"><i class="fa-solid fa-circle-info"></i></span>
+    <div class="callout-body"><strong>Two Layers:</strong> Your app typically wraps the SDK with a service layer (e.g., <code>GroupService</code>) that handles local database operations. The SDK handles the cryptographic protocol and network communication.</div>
+  </div>
+
+  <h3>SDK-Level Creation (Low-Level)</h3>
+  <p>Direct SDK usage for maximum control:</p>
 
   <div class="method-block">
     <div class="method-header">
       <span class="method-name">Step 1: Generate a Group ID</span>
     </div>
     <div class="method-body">
-      <p class="method-desc">Create a unique identifier for the group.</p>
+      <p class="method-desc">The SDK generates a unique group ID with the proper format.</p>
       <pre><span class="kw">string</span> groupId = sdk.<span class="met">GenerateGroupId</span>();
-<span class="cm">// Returns something like "dc1a2b3c4d5e6f..."</span></pre>
+<span class="cm">// Returns "dc" prefixed ID, e.g., "dc1a2b3c4d5e6f..."</span></pre>
     </div>
   </div>
 
@@ -110,21 +116,14 @@
       <span class="method-name">Step 2: Build the Member List</span>
     </div>
     <div class="method-body">
-      <p class="method-desc">Create <code>GroupMemberInfo</code> objects for each member. You need their DID, wallet address, and chat public key.</p>
+      <p class="method-desc">Create <code>GroupMemberInfo</code> objects for each member. You need their DID, wallet address, and chat public key (obtained during contact exchange).</p>
       <pre><span class="kw">var</span> members = <span class="kw">new</span> <span class="cls">List</span>&lt;<span class="cls">GroupMemberInfo</span>&gt;
 {
     <span class="kw">new</span> <span class="cls">GroupMemberInfo</span>
     {
-        Did = <span class="str">"did:dchat:alice"</span>,
-        WalletAddress = <span class="str">"dc1qalice..."</span>,
-        ChatPublicKey = <span class="str">"03a1b2c3..."</span>,  <span class="cm">// hex-encoded</span>
-        DisplayName = <span class="str">"Alice"</span>
-    },
-    <span class="kw">new</span> <span class="cls">GroupMemberInfo</span>
-    {
         Did = <span class="str">"did:dchat:bob"</span>,
         WalletAddress = <span class="str">"dc1qbob..."</span>,
-        ChatPublicKey = <span class="str">"03x9y8z7..."</span>,
+        ChatPublicKey = <span class="str">"03a1b2c3..."</span>,  <span class="cm">// from contact exchange</span>
         DisplayName = <span class="str">"Bob"</span>
     }
 };</pre>
@@ -133,76 +132,62 @@
 
   <div class="method-block">
     <div class="method-header">
-      <span class="method-name">Step 3: Define Admins</span>
+      <span class="method-name">Step 3: Create and Send</span>
     </div>
     <div class="method-body">
-      <p class="method-desc">Admins can add/remove members and change group settings. At minimum, include yourself.</p>
-      <pre><span class="kw">var</span> admins = <span class="kw">new</span> <span class="cls">List</span>&lt;<span class="kw">string</span>&gt;
-{
-    <span class="str">"did:dchat:alice"</span>  <span class="cm">// your DID</span>
-};</pre>
-    </div>
-  </div>
-
-  <div class="method-block">
-    <div class="method-header">
-      <span class="method-name">Step 4: Create the Payload</span>
-    </div>
-    <div class="method-body">
-      <p class="method-desc">Assemble all data into a <code>GroupCreateMessageData</code> object.</p>
+      <p class="method-desc">The creator is automatically added as admin. SDK generates sender keys and distributes them encrypted to each member.</p>
       <pre><span class="kw">var</span> createData = <span class="kw">new</span> <span class="cls">GroupCreateMessageData</span>
-{
-    GroupId = groupId,
-    GroupName = <span class="str">"My Project Team"</span>,
-    Members = members,
-    Admins = admins
-};</pre>
-    </div>
-  </div>
-
-  <div class="method-block">
-    <div class="method-header">
-      <span class="method-name">Step 5: Broadcast to Members</span>
-    </div>
-    <div class="method-body">
-      <p class="method-desc">Send the group creation message. The SDK will generate your sender key, encrypt it for each member, and broadcast everything.</p>
-      <pre><span class="kw">bool</span> success = <span class="kw">await</span> sdk.<span class="met">SendGroupCreateAsync</span>(createData, yourDid);
-
-<span class="kw">if</span> (success) {
-    Console.<span class="met">WriteLine</span>(<span class="str">$"Group {groupId} created successfully!"</span>);
-}</pre>
-    </div>
-  </div>
-
-  <div class="callout tip">
-    <span class="callout-icon"><i class="fa-solid fa-lightbulb"></i></span>
-    <div class="callout-body"><strong>What happens automatically:</strong> The SDK generates a sender key for you, encrypts it with each member's chat public key, and sends it in the <code>GroupCreate</code> message. Members can immediately decrypt your group messages.</div>
-  </div>
-
-  <h3>Full Example</h3>
-  <pre><span class="cm">// Create a group with Alice as admin, Bob and Charlie as members</span>
-
-<span class="cm">// 1. Generate ID</span>
-<span class="kw">string</span> groupId = sdk.<span class="met">GenerateGroupId</span>();
-
-<span class="cm">// 2. Build member list (you need their public keys from contact exchange)</span>
-<span class="kw">var</span> members = <span class="kw">new</span> <span class="cls">List</span>&lt;<span class="cls">GroupMemberInfo</span>&gt;
-{
-    <span class="kw">new</span> <span class="cls">GroupMemberInfo</span> { Did = <span class="str">"did:dchat:bob"</span>, WalletAddress = <span class="str">"dc1qbob..."</span>, ChatPublicKey = bobKey },
-    <span class="kw">new</span> <span class="cls">GroupMemberInfo</span> { Did = <span class="str">"did:dchat:charlie"</span>, WalletAddress = <span class="str">"dc1qcharlie..."</span>, ChatPublicKey = charlieKey }
-};
-
-<span class="cm">// 3. Define admins (include yourself)</span>
-<span class="kw">var</span> admins = <span class="kw">new</span> <span class="cls">List</span>&lt;<span class="kw">string</span>&gt; { <span class="str">"did:dchat:alice"</span> };
-
-<span class="cm">// 4. Create and send</span>
-<span class="kw">await</span> sdk.<span class="met">SendGroupCreateAsync</span>(<span class="kw">new</span> <span class="cls">GroupCreateMessageData</span>
 {
     GroupId = groupId,
     GroupName = <span class="str">"Project Team"</span>,
     Members = members,
-    Admins = admins
-}, <span class="str">"did:dchat:alice"</span>);</pre>
+    Admins = <span class="kw">new</span> <span class="cls">List</span>&lt;<span class="kw">string</span>&gt; { yourDid }  <span class="cm">// you are admin</span>
+};
+
+<span class="kw">bool</span> success = <span class="kw">await</span> sdk.<span class="met">SendGroupCreateAsync</span>(createData, yourDid);</pre>
+    </div>
+  </div>
+
+  <h3>Service Layer Pattern (Recommended)</h3>
+  <p>In production apps, wrap the SDK with a service that handles local state:</p>
+
+  <pre><span class="cm">// Your app's GroupService wraps the SDK</span>
+<span class="kw">public class</span> <span class="cls">GroupService</span>
+{
+    <span class="kw">private readonly</span> <span class="cls">IDChatSDKClient</span> _sdk;
+    <span class="kw">private readonly</span> <span class="cls">IGroupRepository</span> _repo;
+
+    <span class="kw">public async</span> <span class="cls">Task</span>&lt;<span class="cls">ConversationId</span>.Group&gt; <span class="met">CreateGroupAsync</span>(
+        <span class="kw">string</span> groupName,
+        <span class="kw">string</span>[] memberDids,
+        <span class="kw">string</span> creatorDid)
+    {
+        <span class="cm">// 1. SDK generates the group ID</span>
+        <span class="kw">var</span> groupId = _sdk.<span class="met">GenerateGroupId</span>();
+
+        <span class="cm">// 2. Save to local database FIRST</span>
+        <span class="kw">await</span> _repo.<span class="met">CreateAsync</span>(<span class="kw">new</span> <span class="cls">GroupEntity</span>
+        {
+            Id = groupId,
+            GroupName = groupName,
+            CreatorDid = creatorDid
+        });
+
+        <span class="cm">// 3. Add members to database</span>
+        <span class="kw">foreach</span> (<span class="kw">var</span> did <span class="kw">in</span> memberDids)
+            <span class="kw">await</span> _repo.<span class="met">AddMemberAsync</span>(groupId, did);
+
+        <span class="cm">// 4. SDK broadcasts to network</span>
+        <span class="kw">await</span> _sdk.<span class="met">SendGroupCreateAsync</span>(createData, creatorDid);
+
+        <span class="kw">return new</span> <span class="cls">ConversationId</span>.Group(groupId);
+    }
+}</pre>
+
+  <div class="callout tip">
+    <span class="callout-icon"><i class="fa-solid fa-lightbulb"></i></span>
+    <div class="callout-body"><strong>Why save first?</strong> Saving to your local database before sending ensures the group exists even if network fails. The SDK handles retries for the network message.</div>
+  </div>
 
   <div class="callout info">
     <span class="callout-icon"><i class="fa-solid fa-circle-info"></i></span>
@@ -213,30 +198,91 @@
 <!-- Detecting Groups -->
 <div class="section">
   <h2>Detecting Groups</h2>
-  <p>When you receive a message or chat ID, you may need to determine whether it's a direct message (1:1) or a group chat. The SDK provides two ways to check this.</p>
+  <p>When you receive a message, you need to know if it's for a group or direct chat. The SDK delegates this check to your app via <code>IGroupMemberProvider</code>.</p>
 
+  <h3>How It Works</h3>
+  <div class="infographic">
+    <div class="infographic-title">Message Routing Flow</div>
+    <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+      <div class="arch-box">
+        <div class="arch-box-title"><i class="fa-solid fa-envelope" style="margin-right: 8px; color: var(--accent);"></i>Incoming Message</div>
+        <div class="arch-box-subtitle">Message arrives with ChatId field</div>
+      </div>
+      <div style="display: flex; justify-content: center;">
+        <div class="arch-connector">
+          <div class="arch-arrow vertical"></div>
+        </div>
+      </div>
+      <div class="arch-box highlight">
+        <div class="arch-box-title"><i class="fa-solid fa-question-circle" style="margin-right: 8px; color: var(--accent2);"></i>SDK Calls IsGroupAsync(ChatId)</div>
+        <div class="arch-box-subtitle">Delegates to your IGroupMemberProvider</div>
+      </div>
+      <div style="display: flex; justify-content: center;">
+        <div class="arch-connector">
+          <div class="arch-arrow vertical"></div>
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="arch-box" style="border-color: rgba(62, 207, 142, 0.4); background: rgba(62, 207, 142, 0.08);">
+          <div class="arch-box-title" style="color: #3ecf8e;"><i class="fa-solid fa-users" style="margin-right: 8px;"></i>true = Group</div>
+          <div class="arch-box-subtitle">Use group decryption with sender key</div>
+        </div>
+        <div class="arch-box" style="border-color: rgba(91, 141, 238, 0.4); background: rgba(91, 141, 238, 0.08);">
+          <div class="arch-box-title" style="color: #5b8dee;"><i class="fa-solid fa-user" style="margin-right: 8px;"></i>false = Direct</div>
+          <div class="arch-box-subtitle">Use ECDH decryption with chat key</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Implementing IGroupMemberProvider</h3>
+  <p>You must implement this interface and register it during SDK initialization. The SDK doesn't store group state - your app does.</p>
+
+  <pre><span class="kw">public class</span> <span class="cls">GroupMemberProvider</span> : <span class="cls">IGroupMemberProvider</span>
+{
+    <span class="kw">private readonly</span> <span class="cls">IGroupRepository</span> _repo;
+
+    <span class="kw">public async</span> <span class="cls">Task</span>&lt;<span class="kw">bool</span>&gt; <span class="met">IsGroupAsync</span>(<span class="kw">string</span> chatId)
+    {
+        <span class="cm">// Check YOUR database - SDK doesn't know</span>
+        <span class="kw">var</span> group = <span class="kw">await</span> _repo.<span class="met">GetByIdAsync</span>(chatId);
+        <span class="kw">return</span> group != <span class="kw">null</span>;
+    }
+
+    <span class="kw">public async</span> <span class="cls">Task</span>&lt;<span class="cls">IReadOnlyList</span>&lt;<span class="cls">GroupMemberInfo</span>&gt;&gt; <span class="met">GetGroupMembersAsync</span>(<span class="kw">string</span> groupId)
+    {
+        <span class="cm">// Return all active members for sender key distribution</span>
+        <span class="kw">return await</span> _repo.<span class="met">GetMembersAsync</span>(groupId);
+    }
+}</pre>
+
+  <h3>Registering the Provider</h3>
+  <pre><span class="kw">var</span> options = <span class="cls">DChatSdkOptions</span>.<span class="met">CreateBuilder</span>()
+    .<span class="met">AddNode</span>(nodeConfig)
+    .<span class="met">SetGroupMemberProvider</span>(<span class="kw">new</span> <span class="cls">GroupMemberProvider</span>(repo))
+    .<span class="met">Build</span>();</pre>
+
+  <h3>Convenience Method</h3>
   <div class="method-block">
     <div class="method-header">
       <span class="method-name">IsGroupChatAsync</span>
       <span class="method-return">Task&lt;bool&gt;</span>
     </div>
     <div class="method-body">
-      <p class="method-desc">Checks if a chat ID corresponds to a group chat. This is a convenience method on the SDK client.</p>
+      <p class="method-desc">SDK wrapper that calls your <code>IGroupMemberProvider.IsGroupAsync</code> internally.</p>
       <pre><span class="kw">bool</span> isGroup = <span class="kw">await</span> sdk.<span class="met">IsGroupChatAsync</span>(chatId);
 
 <span class="kw">if</span> (isGroup) {
-    <span class="cm">// Use group messaging methods</span>
-    <span class="kw">await</span> sdk.<span class="met">SendGroupMessageAsync</span>(<span class="kw">new</span> <span class="cls">ConversationId</span>.Group(chatId), payload, senderDid);
+    <span class="cm">// Route to group chat UI</span>
 } <span class="kw">else</span> {
-    <span class="cm">// Use direct messaging methods</span>
-    <span class="kw">await</span> sdk.<span class="met">SendTextMessageAsync</span>(recipientDid, <span class="str">"Hello!"</span>);
+    <span class="cm">// Route to direct message UI</span>
 }</pre>
     </div>
   </div>
 
   <div class="callout tip">
     <span class="callout-icon"><i class="fa-solid fa-lightbulb"></i></span>
-    <div class="callout-body"><strong>IGroupMemberProvider.IsGroupAsync</strong> - The SDK doesn't store group state. It delegates this check to your implementation of <code>IGroupMemberProvider.IsGroupAsync</code>. You must implement this interface and register it via <code>SetGroupMemberProvider()</code> in the options builder.</div>
+    <div class="callout-body"><strong>Why delegate to your app?</strong> The SDK is stateless by design. Your app manages the UI and local database, so only you know which chat IDs are groups. This separation keeps the SDK focused on cryptography and networking.</div>
   </div>
 </div>
 
