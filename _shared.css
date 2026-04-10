@@ -1758,14 +1758,18 @@ button:focus-visible {
     background: var(--bg);
     border-bottom: 1px solid var(--border);
     padding: 12px 1.25rem;
+    padding-left: 60px;
     z-index: 100;
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 12px;
   }
 
   .topbar .breadcrumb {
     font-size: 13px;
+    justify-content: flex-end;
+    text-align: right;
   }
 
   /* Breadcrumb */
