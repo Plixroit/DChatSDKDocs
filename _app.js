@@ -54,12 +54,15 @@
   const contentEl = document.getElementById('content');
   const submenuEl = document.querySelector('.sidebar-submenu');
   const chevronBtn = document.querySelector('.sidebar-chevron');
+  const menuToggle = document.getElementById('menuToggle');
+  const sidebarOverlay = document.getElementById('sidebarOverlay');
+  const sidebar = document.querySelector('.sidebar');
 
   // Initialize
   function init() {
     // Handle browser back/forward
     window.addEventListener('hashchange', handleHashChange);
-    
+
     // Handle sidebar link clicks
     document.querySelectorAll('.sidebar a[data-page]').forEach(link => {
       link.addEventListener('click', (e) => {
@@ -73,6 +76,7 @@
         }
 
         navigateTo(page);
+        closeMobileMenu();
       });
     });
 
@@ -81,10 +85,43 @@
       chevronBtn.addEventListener('click', toggleSubmenu);
     }
 
+    // Mobile menu toggle
+    if (menuToggle) {
+      menuToggle.addEventListener('click', toggleMobileMenu);
+    }
+
+    // Close menu when clicking overlay
+    if (sidebarOverlay) {
+      sidebarOverlay.addEventListener('click', closeMobileMenu);
+    }
+
     // Initial load from hash or default
     const hash = window.location.hash.slice(2); // Remove '#/'
     const initialPage = hash || DEFAULT_PAGE;
     navigateTo(initialPage, true);
+  }
+
+  // Toggle mobile menu
+  function toggleMobileMenu() {
+    if (!sidebar || !menuToggle || !sidebarOverlay) return;
+    const isOpen = sidebar.classList.contains('open');
+    if (isOpen) {
+      closeMobileMenu();
+    } else {
+      sidebar.classList.add('open');
+      menuToggle.classList.add('active');
+      sidebarOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  // Close mobile menu
+  function closeMobileMenu() {
+    if (!sidebar || !menuToggle || !sidebarOverlay) return;
+    sidebar.classList.remove('open');
+    menuToggle.classList.remove('active');
+    sidebarOverlay.classList.remove('active');
+    document.body.style.overflow = '';
   }
 
   // Navigate to a page

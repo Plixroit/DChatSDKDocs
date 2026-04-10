@@ -1553,7 +1553,7 @@ button:focus-visible {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  
+
   .main,
   .section,
   .page-header,
@@ -1565,5 +1565,283 @@ button:focus-visible {
   .callout {
     opacity: 1 !important;
     transform: none !important;
+  }
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+/* Mobile menu toggle button */
+.menu-toggle {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 200;
+  width: 44px;
+  height: 44px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  font-size: 20px;
+  transition: all 0.3s ease;
+}
+
+.menu-toggle:hover {
+  background: var(--surface2);
+  border-color: var(--accent);
+}
+
+.menu-toggle.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+/* Tablet - 1024px and below */
+@media (max-width: 1024px) {
+  :root {
+    --sidebar-w: 280px;
+  }
+
+  .layout-wrapper {
+    max-width: 100%;
+  }
+
+  .main {
+    padding: 2rem 1.5rem;
+  }
+
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mobile landscape - 768px and below */
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: flex;
+  }
+
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    z-index: 150;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* Overlay when sidebar is open */
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 140;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .sidebar-overlay.active {
+    display: block;
+    opacity: 1;
+  }
+
+  .main {
+    width: 100%;
+    padding: 4rem 1.25rem 2rem;
+  }
+
+  .page-header {
+    padding: 0 0 1.5rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .page-header .lead {
+    font-size: 0.95rem;
+  }
+
+  .section {
+    margin-bottom: 2.5rem;
+  }
+
+  .section h2 {
+    font-size: 1.35rem;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .card {
+    padding: 1.25rem;
+  }
+
+  .type-card {
+    padding: 1.1rem;
+  }
+
+  /* Tables scroll horizontally */
+  .method-table,
+  .param-table,
+  .enum-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  /* Infographic adjustments */
+  .infographic {
+    padding: 1.5rem;
+  }
+
+  .arch-services {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Code blocks */
+  pre {
+    font-size: 12px;
+    padding: 1rem;
+    overflow-x: auto;
+  }
+
+  code {
+    font-size: 12px;
+  }
+
+  /* Callouts */
+  .callout {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .callout-icon {
+    margin-bottom: 4px;
+  }
+
+  /* Page nav */
+  .page-nav {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .page-nav a {
+    width: 100%;
+  }
+
+  /* Topbar */
+  .topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 1.25rem;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .topbar .breadcrumb {
+    font-size: 13px;
+  }
+
+  /* Breadcrumb */
+  .breadcrumb {
+    flex-wrap: wrap;
+  }
+}
+
+/* Mobile portrait - 480px and below */
+@media (max-width: 480px) {
+  .main {
+    padding: 3.5rem 1rem 1.5rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .section h2 {
+    font-size: 1.2rem;
+  }
+
+  .section h3 {
+    font-size: 1.05rem;
+  }
+
+  .card-title,
+  .tc-name {
+    font-size: 0.95rem;
+  }
+
+  .card-desc,
+  .tc-desc {
+    font-size: 0.85rem;
+  }
+
+  /* Method blocks */
+  .method-block {
+    padding: 1rem;
+  }
+
+  .method-name {
+    font-size: 0.9rem;
+  }
+
+  /* Param table */
+  .param-table th,
+  .param-table td {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+
+  /* Infographic */
+  .infographic {
+    padding: 1rem;
+  }
+
+  .infographic-title {
+    font-size: 0.95rem;
+  }
+
+  .arch-box {
+    padding: 0.875rem;
+  }
+
+  .arch-box-title {
+    font-size: 0.85rem;
+  }
+
+  .arch-label {
+    font-size: 10px;
+  }
+
+  /* Two-column layouts */
+  .encrypt-column,
+  [style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
   }
 }
