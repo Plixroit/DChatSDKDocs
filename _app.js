@@ -15,9 +15,9 @@
   // API sub-pages for auto-expand
   const API_PAGES = [
     'api-reference', 'api-connection', 'api-identity', 'api-chat-keys',
-    'api-encryption', 'api-group-keys', 'api-messaging', 'api-group-messaging',
-    'api-group-control', 'api-contact', 'api-presence', 'api-media',
-    'api-network', 'api-events'
+    'api-encryption', 'api-group-keys', 'api-messaging', 'api-group-creation',
+    'api-group-control', 'api-group-messaging', 'api-contact', 'api-presence',
+    'api-media', 'api-network', 'api-events'
   ];
 
   // Page titles for document.title
@@ -38,8 +38,9 @@
     'api-encryption': 'Encryption API - DChat SDK',
     'api-group-keys': 'Group Keys API - DChat SDK',
     'api-messaging': 'Messaging API - DChat SDK',
-    'api-group-messaging': 'Group Messaging API - DChat SDK',
+    'api-group-creation': 'Group Creation API - DChat SDK',
     'api-group-control': 'Group Control API - DChat SDK',
+    'api-group-messaging': 'Group Messaging API - DChat SDK',
     'api-contact': 'Contacts & Profile API - DChat SDK',
     'api-presence': 'Presence API - DChat SDK',
     'api-media': 'Media & IPFS API - DChat SDK',

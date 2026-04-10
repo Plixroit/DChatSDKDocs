@@ -4,141 +4,12 @@
 
 <div class="page-header">
   <h1>Group Control Operations</h1>
-  <p class="lead">Create groups, manage members, update settings, and handle group metadata.</p>
+  <p class="lead">Manage members, update settings, and handle group metadata.</p>
 </div>
 
-<div class="section">
-  <h2>Setup</h2>
-
-  <p>The SDK handles cryptography and networking, but your app must subscribe to events to save incoming group messages to your database.</p>
-
-  <h3>Subscribe to Group Events</h3>
-  <p>During your service initialization, subscribe to <code>MessageTypeManager</code> events:</p>
-
-  <pre><span class="cm">// In your service initialization</span>
-<span class="kw">using</span> DChatSDK.Messaging.Services;
-
-<span class="kw">public void</span> <span class="met">Initialize</span>()
-{
-    <span class="cm">// Group lifecycle events</span>
-    MessageTypeManager.GroupCreateReceived += HandleGroupCreateReceived;
-    MessageTypeManager.GroupMemberAddReceived += HandleGroupMemberAddReceived;
-    MessageTypeManager.GroupMemberRemoveReceived += HandleGroupMemberRemoveReceived;
-    MessageTypeManager.GroupAdminUpdateReceived += HandleGroupAdminUpdateReceived;
-
-    <span class="cm">// Group settings events</span>
-    MessageTypeManager.GroupNameChangeReceived += HandleGroupNameChangeReceived;
-    MessageTypeManager.GroupPhotoChangeReceived += HandleGroupPhotoChangeReceived;
-}</pre>
-
-  <div class="callout info">
-    <span class="callout-icon"><i class="fa-solid fa-circle-info"></i></span>
-    <div class="callout-body"><strong>Why events?</strong> The SDK is stateless - it doesn't have your database. When a <code>GroupCreate</code> message arrives, the SDK decrypts it and fires an event. Your app handles the event and saves to database so the group appears in the chat list.</div>
-  </div>
-
-  <div class="method-block">
-    <div class="method-header">
-      <span class="method-name">GenerateGroupId</span>
-      <span class="method-return">string</span>
-    </div>
-    <div class="method-body">
-      <p class="method-desc">Generates a unique group ID prefixed with "dc". Call this before creating a group.</p>
-      <pre><span class="kw">string</span> groupId = sdk.<span class="met">GenerateGroupId</span>(); <span class="cm">// e.g., "dc1a2b3c..."</span></pre>
-    </div>
-  </div>
-</div>
-
-<div class="section">
-  <h2>Group Creation</h2>
-
-  <div class="callout info">
-    <span class="callout-icon"><i class="fa-solid fa-circle-info"></i></span>
-    <div class="callout-body"><strong>Concept Guide:</strong> For a detailed explanation of group architecture and event handling, see <a href="#/groups" data-page="groups">Groups</a>.</div>
-  </div>
-
-  <h3>Complete Creation Flow</h3>
-
-  <pre><span class="cm">// 1. Generate a unique group ID</span>
-<span class="kw">string</span> groupId = sdk.<span class="met">GenerateGroupId</span>();
-<span class="cm">// Returns "dc" prefixed ID, e.g., "dc1a2b3c4d5e..."</span>
-
-<span class="cm">// 2. Build member info list (you need their public keys from contact exchange)</span>
-<span class="kw">var</span> members = <span class="kw">new</span> <span class="cls">List</span>&lt;<span class="cls">GroupMemberInfo</span>&gt;
-{
-    <span class="kw">new</span> <span class="cls">GroupMemberInfo</span>
-    {
-        Did = <span class="str">"did:dchat:bob"</span>,
-        WalletAddress = <span class="str">"dc1qbob..."</span>,
-        ChatPublicKey = <span class="str">"03a1b2c3..."</span>,  <span class="cm">// hex Secp256k1 key</span>
-        DisplayName = <span class="str">"Bob"</span>
-    },
-    <span class="kw">new</span> <span class="cls">GroupMemberInfo</span>
-    {
-        Did = <span class="str">"did:dchat:charlie"</span>,
-        WalletAddress = <span class="str">"dc1qcharlie..."</span>,
-        ChatPublicKey = <span class="str">"03x9y8z7..."</span>,
-        DisplayName = <span class="str">"Charlie"</span>
-    }
-};
-
-<span class="cm">// 3. Define admins (creator is automatically admin)</span>
-<span class="kw">var</span> admins = <span class="kw">new</span> <span class="cls">List</span>&lt;<span class="kw">string</span>&gt; { <span class="str">"did:dchat:alice"</span> };
-
-<span class="cm">// 4. Create the payload</span>
-<span class="kw">var</span> createData = <span class="kw">new</span> <span class="cls">GroupCreateMessageData</span>
-{
-    GroupId = groupId,
-    GroupName = <span class="str">"Project Team"</span>,
-    GroupDescription = <span class="str">"Development team chat"</span>,
-    Members = members,
-    Admins = admins,
-    GroupAvatar = <span class="str">""</span>  <span class="cm">// Optional: base64-encoded image</span>
-};
-
-<span class="cm">// 5. Send to all members (SDK encrypts sender keys automatically)</span>
-<span class="kw">bool</span> success = <span class="kw">await</span> sdk.<span class="met">SendGroupCreateAsync</span>(createData, <span class="str">"did:dchat:alice"</span>);</pre>
-
-  <div class="callout tip">
-    <span class="callout-icon"><i class="fa-solid fa-lightbulb"></i></span>
-    <div class="callout-body"><strong>Where do public keys come from?</strong> Member public keys are obtained during contact exchange. When a user accepts a contact request, their public key is shared and stored. Use your app's contact repository to retrieve them.</div>
-  </div>
-
-  <h3>Method Reference</h3>
-
-  <div class="method-block">
-    <div class="method-header">
-      <span class="method-name">SendGroupCreateAsync</span>
-      <span class="method-return">Task&lt;bool&gt;</span>
-    </div>
-    <div class="method-body">
-      <p class="method-desc">Sends a group creation message to all initial members with encrypted sender keys. The SDK automatically generates a sender key for the creator and distributes it encrypted to each member.</p>
-      <table class="param-table">
-        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
-        <tr><td>createData</td><td>GroupCreateMessageData</td><td>Group creation payload (see below)</td></tr>
-        <tr><td>senderDid</td><td>string</td><td>Creator's DID</td></tr>
-      </table>
-    </div>
-  </div>
-
-  <h3>GroupCreateMessageData Properties</h3>
-  <table class="prop-table">
-    <tr><th>Property</th><th>Type</th><th>Description</th></tr>
-    <tr><td class="pname">GroupId</td><td class="ptype">string</td><td>Unique group ID from <code>GenerateGroupId()</code></td></tr>
-    <tr><td class="pname">GroupName</td><td class="ptype">string</td><td>Display name for the group</td></tr>
-    <tr><td class="pname">GroupDescription</td><td class="ptype">string?</td><td>Optional group description</td></tr>
-    <tr><td class="pname">Members</td><td class="ptype">List&lt;GroupMemberInfo&gt;</td><td>Initial member list with public keys</td></tr>
-    <tr><td class="pname">Admins</td><td class="ptype">List&lt;string&gt;</td><td>DIDs of members with admin privileges</td></tr>
-    <tr><td class="pname">GroupAvatar</td><td class="ptype">string?</td><td>Optional base64-encoded avatar image</td></tr>
-  </table>
-
-  <h3>GroupMemberInfo Properties</h3>
-  <table class="prop-table">
-    <tr><th>Property</th><th>Type</th><th>Description</th></tr>
-    <tr><td class="pname">Did</td><td class="ptype">string</td><td>Member's DID (<code>did:dchat:username</code>)</td></tr>
-    <tr><td class="pname">WalletAddress</td><td class="ptype">string</td><td>Bech32 wallet address for message routing</td></tr>
-    <tr><td class="pname">ChatPublicKey</td><td class="ptype">string</td><td>Hex-encoded Secp256k1 public key for encryption</td></tr>
-    <tr><td class="pname">DisplayName</td><td class="ptype">string?</td><td>Human-readable name (UI only)</td></tr>
-  </table>
+<div class="callout info">
+  <span class="callout-icon"><i class="fa-solid fa-circle-info"></i></span>
+  <div class="callout-body"><strong>Creating groups?</strong> See <a href="#/api-group-creation" data-page="api-group-creation">Group Creation API</a> for creating new groups.</div>
 </div>
 
 <div class="section">
@@ -300,12 +171,12 @@
 </div>
 
 <div class="page-nav">
-  <a href="#/api-group-messaging" data-page="api-group-messaging">
-    <span class="nav-dir"> Previous</span>
-    <span class="nav-title">Group Messaging API</span>
+  <a href="#/api-group-creation" data-page="api-group-creation">
+    <span class="nav-dir">Previous</span>
+    <span class="nav-title">Group Creation API</span>
   </a>
-  <a href="#/api-contact" data-page="api-contact" class="next">
-    <span class="nav-dir">Next </span>
-    <span class="nav-title">Contacts &amp; Profile API</span>
+  <a href="#/api-group-messaging" data-page="api-group-messaging" class="next">
+    <span class="nav-dir">Next</span>
+    <span class="nav-title">Group Messaging API</span>
   </a>
 </div>
