@@ -35,29 +35,95 @@
 
 <div class="section">
   <h2>Group Creation</h2>
-  
+
+  <div class="callout info">
+    <span class="callout-icon"><i class="fa-solid fa-circle-info"></i></span>
+    <div class="callout-body"><strong>Concept Guide:</strong> For a detailed explanation of group architecture and event handling, see <a href="#/groups" data-page="groups">Groups</a>.</div>
+  </div>
+
+  <h3>Complete Creation Flow</h3>
+
+  <pre><span class="cm">// 1. Generate a unique group ID</span>
+<span class="kw">string</span> groupId = sdk.<span class="met">GenerateGroupId</span>();
+<span class="cm">// Returns "dc" prefixed ID, e.g., "dc1a2b3c4d5e..."</span>
+
+<span class="cm">// 2. Build member info list (you need their public keys from contact exchange)</span>
+<span class="kw">var</span> members = <span class="kw">new</span> <span class="cls">List</span>&lt;<span class="cls">GroupMemberInfo</span>&gt;
+{
+    <span class="kw">new</span> <span class="cls">GroupMemberInfo</span>
+    {
+        Did = <span class="str">"did:dchat:bob"</span>,
+        WalletAddress = <span class="str">"dc1qbob..."</span>,
+        ChatPublicKey = <span class="str">"03a1b2c3..."</span>,  <span class="cm">// hex Secp256k1 key</span>
+        DisplayName = <span class="str">"Bob"</span>
+    },
+    <span class="kw">new</span> <span class="cls">GroupMemberInfo</span>
+    {
+        Did = <span class="str">"did:dchat:charlie"</span>,
+        WalletAddress = <span class="str">"dc1qcharlie..."</span>,
+        ChatPublicKey = <span class="str">"03x9y8z7..."</span>,
+        DisplayName = <span class="str">"Charlie"</span>
+    }
+};
+
+<span class="cm">// 3. Define admins (creator is automatically admin)</span>
+<span class="kw">var</span> admins = <span class="kw">new</span> <span class="cls">List</span>&lt;<span class="kw">string</span>&gt; { <span class="str">"did:dchat:alice"</span> };
+
+<span class="cm">// 4. Create the payload</span>
+<span class="kw">var</span> createData = <span class="kw">new</span> <span class="cls">GroupCreateMessageData</span>
+{
+    GroupId = groupId,
+    GroupName = <span class="str">"Project Team"</span>,
+    GroupDescription = <span class="str">"Development team chat"</span>,
+    Members = members,
+    Admins = admins,
+    GroupAvatar = <span class="str">""</span>  <span class="cm">// Optional: base64-encoded image</span>
+};
+
+<span class="cm">// 5. Send to all members (SDK encrypts sender keys automatically)</span>
+<span class="kw">bool</span> success = <span class="kw">await</span> sdk.<span class="met">SendGroupCreateAsync</span>(createData, <span class="str">"did:dchat:alice"</span>);</pre>
+
+  <div class="callout tip">
+    <span class="callout-icon"><i class="fa-solid fa-lightbulb"></i></span>
+    <div class="callout-body"><strong>Where do public keys come from?</strong> Member public keys are obtained during contact exchange. When a user accepts a contact request, their public key is shared and stored. Use your app's contact repository to retrieve them.</div>
+  </div>
+
+  <h3>Method Reference</h3>
+
   <div class="method-block">
     <div class="method-header">
       <span class="method-name">SendGroupCreateAsync</span>
       <span class="method-return">Task&lt;bool&gt;</span>
     </div>
     <div class="method-body">
-      <p class="method-desc">Sends a group creation message to all initial members with encrypted sender keys.</p>
+      <p class="method-desc">Sends a group creation message to all initial members with encrypted sender keys. The SDK automatically generates a sender key for the creator and distributes it encrypted to each member.</p>
       <table class="param-table">
         <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
-        <tr><td>createData</td><td>GroupCreateMessageData</td><td>Group creation payload</td></tr>
+        <tr><td>createData</td><td>GroupCreateMessageData</td><td>Group creation payload (see below)</td></tr>
         <tr><td>senderDid</td><td>string</td><td>Creator's DID</td></tr>
       </table>
-      <pre><span class="kw">var</span> createData = <span class="kw">new</span> <span class="cls">GroupCreateMessageData</span>
-{
-    GroupId = groupId,
-    GroupName = <span class="str">"My Group"</span>,
-    Members = initialMembers,
-    Admins = adminList
-};
-<span class="kw">await</span> sdk.<span class="met">SendGroupCreateAsync</span>(createData, senderDid);</pre>
     </div>
   </div>
+
+  <h3>GroupCreateMessageData Properties</h3>
+  <table class="prop-table">
+    <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+    <tr><td class="pname">GroupId</td><td class="ptype">string</td><td>Unique group ID from <code>GenerateGroupId()</code></td></tr>
+    <tr><td class="pname">GroupName</td><td class="ptype">string</td><td>Display name for the group</td></tr>
+    <tr><td class="pname">GroupDescription</td><td class="ptype">string?</td><td>Optional group description</td></tr>
+    <tr><td class="pname">Members</td><td class="ptype">List&lt;GroupMemberInfo&gt;</td><td>Initial member list with public keys</td></tr>
+    <tr><td class="pname">Admins</td><td class="ptype">List&lt;string&gt;</td><td>DIDs of members with admin privileges</td></tr>
+    <tr><td class="pname">GroupAvatar</td><td class="ptype">string?</td><td>Optional base64-encoded avatar image</td></tr>
+  </table>
+
+  <h3>GroupMemberInfo Properties</h3>
+  <table class="prop-table">
+    <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+    <tr><td class="pname">Did</td><td class="ptype">string</td><td>Member's DID (<code>did:dchat:username</code>)</td></tr>
+    <tr><td class="pname">WalletAddress</td><td class="ptype">string</td><td>Bech32 wallet address for message routing</td></tr>
+    <tr><td class="pname">ChatPublicKey</td><td class="ptype">string</td><td>Hex-encoded Secp256k1 public key for encryption</td></tr>
+    <tr><td class="pname">DisplayName</td><td class="ptype">string?</td><td>Human-readable name (UI only)</td></tr>
+  </table>
 </div>
 
 <div class="section">
