@@ -87,6 +87,75 @@
   </div>
 </div>
 
+<!-- Group Creation -->
+<div class="section">
+  <h2>Creating a Group</h2>
+  <p>Groups are created by an admin who broadcasts a <code>GroupCreateMessageData</code> to all initial members. The SDK handles sender-key generation and distribution automatically.</p>
+
+  <div class="callout info">
+    <span class="callout-icon"><i class="fa-solid fa-circle-info"></i></span>
+    <div class="callout-body"><strong>See Group Control API</strong> - Full method signatures and parameters are documented in <a href="#/api-group-control" data-page="api-group-control">Group Control API</a>.</div>
+  </div>
+
+  <h3>Quick Example</h3>
+  <pre><span class="cm">// 1. Generate a unique group ID</span>
+<span class="kw">string</span> groupId = sdk.<span class="met">GenerateGroupId</span>(); <span class="cm">// e.g., "dc1a2b3c..."</span>
+
+<span class="cm">// 2. Prepare initial members and admins</span>
+<span class="kw">var</span> initialMembers = <span class="kw">new</span> <span class="cls">List</span>&lt;<span class="cls">GroupMemberInfo</span>&gt; { alice, bob, charlie };
+<span class="kw">var</span> adminList = <span class="kw">new</span> <span class="cls">List</span>&lt;<span class="kw">string</span>&gt; { yourDid };
+
+<span class="cm">// 3. Create the group payload</span>
+<span class="kw">var</span> createData = <span class="kw">new</span> <span class="cls">GroupCreateMessageData</span>
+{
+    GroupId = groupId,
+    GroupName = <span class="str">"My Group"</span>,
+    Members = initialMembers,
+    Admins = adminList
+};
+
+<span class="cm">// 4. Broadcast creation to all members</span>
+<span class="kw">await</span> sdk.<span class="met">SendGroupCreateAsync</span>(createData, yourDid);</pre>
+
+  <h3>What Happens Internally</h3>
+  <ol style="margin-left: 1.5rem; color: var(--text-muted); line-height: 2;">
+    <li>SDK generates a sender key for you</li>
+    <li>Encrypts your sender key with each member's chat public key</li>
+    <li>Broadcasts the <code>GroupCreate</code> message to all members</li>
+    <li>Each member stores your sender key for decrypting your group messages</li>
+  </ol>
+</div>
+
+<!-- Detecting Groups -->
+<div class="section">
+  <h2>Detecting Groups</h2>
+  <p>When you receive a message or chat ID, you may need to determine whether it's a direct message (1:1) or a group chat. The SDK provides two ways to check this.</p>
+
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">IsGroupChatAsync</span>
+      <span class="method-return">Task&lt;bool&gt;</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Checks if a chat ID corresponds to a group chat. This is a convenience method on the SDK client.</p>
+      <pre><span class="kw">bool</span> isGroup = <span class="kw">await</span> sdk.<span class="met">IsGroupChatAsync</span>(chatId);
+
+<span class="kw">if</span> (isGroup) {
+    <span class="cm">// Use group messaging methods</span>
+    <span class="kw">await</span> sdk.<span class="met">SendGroupMessageAsync</span>(<span class="kw">new</span> <span class="cls">ConversationId</span>.Group(chatId), payload, senderDid);
+} <span class="kw">else</span> {
+    <span class="cm">// Use direct messaging methods</span>
+    <span class="kw">await</span> sdk.<span class="met">SendTextMessageAsync</span>(recipientDid, <span class="str">"Hello!"</span>);
+}</pre>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <span class="callout-icon"><i class="fa-solid fa-lightbulb"></i></span>
+    <div class="callout-body"><strong>IGroupMemberProvider.IsGroupAsync</strong> - The SDK doesn't store group state. It delegates this check to your implementation of <code>IGroupMemberProvider.IsGroupAsync</code>. You must implement this interface and register it via <code>SetGroupMemberProvider()</code> in the options builder.</div>
+  </div>
+</div>
+
 <!-- Group messaging methods -->
 <div class="section">
   <h2>Group Messaging</h2>
