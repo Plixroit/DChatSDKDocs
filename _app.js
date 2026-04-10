@@ -9,7 +9,7 @@
 (function() {
   'use strict';
 
-  const CONTENT_DIR = 'content/';
+  const CONTENT_DIR = './content/';
   const DEFAULT_PAGE = 'intro';
   
   // API sub-pages for auto-expand
