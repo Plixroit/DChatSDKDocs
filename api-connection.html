@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Connection API - DChat SDK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link rel="stylesheet" href="_shared.css"/>
+</head>
+<body>
+
+<div class="layout-wrapper">
+<aside class="sidebar">
+  <a href="index.html" class="sidebar-logo">
+    <div class="logo-icon"><img src="Dchat.svg" alt="DChat"></div>
+    <div><div class="logo-text">DChat SDK</div><div class="logo-sub">Developer Docs</div></div>
+  </a>
+  <nav>
+    <div class="sidebar-section"><div class="sidebar-section-title">Overview</div>
+      <a href="index.html"><i class="nav-icon fa-solid fa-house"></i> Introduction</a>
+      <a href="getting-started.html"><i class="nav-icon fa-solid fa-rocket"></i> Getting Started</a>
+      <a href="configuration.html"><i class="nav-icon fa-solid fa-gear"></i> Configuration</a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-section-title">Core APIs</div>
+      <a href="identity.html"><i class="nav-icon fa-solid fa-id-card"></i> Identity &amp; Keys</a>
+      <a href="encryption.html"><i class="nav-icon fa-solid fa-lock"></i> Encryption</a>
+      <a href="messaging.html"><i class="nav-icon fa-solid fa-message"></i> Messaging</a>
+      <a href="groups.html"><i class="nav-icon fa-solid fa-users"></i> Groups</a>
+      <a href="streaming.html"><i class="nav-icon fa-solid fa-tower-broadcast"></i> Streaming</a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-section-title">Reference</div>
+      <a href="message-types.html"><i class="nav-icon fa-solid fa-list"></i> Message Types</a>
+      <a href="api-reference.html"><i class="nav-icon fa-solid fa-code"></i> API Reference</a>
+      <div class="sidebar-submenu">
+        <a href="api-connection.html" class="active"><i class="nav-icon fa-solid fa-plug"></i> Connection</a>
+        <a href="api-identity.html"><i class="nav-icon fa-solid fa-id-card"></i> Identity</a>
+        <a href="api-chat-keys.html"><i class="nav-icon fa-solid fa-key"></i> Chat Keys</a>
+        <a href="api-encryption.html"><i class="nav-icon fa-solid fa-lock"></i> Encryption</a>
+        <a href="api-group-keys.html"><i class="nav-icon fa-solid fa-users-gear"></i> Group Keys</a>
+        <a href="api-messaging.html"><i class="nav-icon fa-solid fa-paper-plane"></i> Messaging</a>
+        <a href="api-group-messaging.html"><i class="nav-icon fa-solid fa-users"></i> Group Messaging</a>
+        <a href="api-group-control.html"><i class="nav-icon fa-solid fa-user-gear"></i> Group Control</a>
+        <a href="api-contact.html"><i class="nav-icon fa-solid fa-address-book"></i> Contacts &amp; Profile</a>
+        <a href="api-presence.html"><i class="nav-icon fa-solid fa-circle-dot"></i> Presence</a>
+        <a href="api-media.html"><i class="nav-icon fa-solid fa-photo-film"></i> Media &amp; IPFS</a>
+        <a href="api-network.html"><i class="nav-icon fa-solid fa-network-wired"></i> Network</a>
+        <a href="api-events.html"><i class="nav-icon fa-solid fa-bolt"></i> Events</a>
+      </div>
+    </div>
+  </nav>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="breadcrumb"><a href="index.html">DChat SDK</a> <span></span> <a href="api-reference.html">API Reference</a> <span></span> Connection</div>
+  </div>
+
+  <div class="page-header">
+    <h1>Connection Management</h1>
+    <p class="lead">Methods and properties for managing the connection to the messaging service.</p>
+  </div>
+
+  <div class="section">
+    <div class="method-block">
+      <div class="method-header">
+        <span class="method-name">ConnectAsync</span>
+        <span class="method-return">Task&lt;bool&gt;</span>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Connects to the messaging service using the active identity. Returns true if connection succeeded.</p>
+        <pre><span class="kw">bool</span> connected = <span class="kw">await</span> sdk.<span class="met">ConnectAsync</span>();
+<span class="kw">if</span> (connected) {
+    Console.<span class="met">WriteLine</span>(<span class="str">"Connected successfully"</span>);
+}</pre>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <span class="method-name">DisconnectAsync</span>
+        <span class="method-return">Task</span>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Disconnects from the messaging service gracefully. Flushes pending messages before closing.</p>
+        <pre><span class="kw">await</span> sdk.<span class="met">DisconnectAsync</span>();</pre>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <span class="method-name">IsConnected</span>
+        <span class="method-return">bool</span>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Gets whether the client is currently connected to the messaging service.</p>
+        <pre><span class="kw">if</span> (sdk.IsConnected) {
+    <span class="cm">// Ready to send messages</span>
+}</pre>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <span class="method-name">IsAuthenticated</span>
+        <span class="method-return">bool</span>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Gets whether the client has an active identity loaded (key pair available).</p>
+        <pre><span class="kw">if</span> (sdk.IsAuthenticated) {
+    <span class="cm">// Identity loaded, can sign and encrypt</span>
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <a href="api-reference.html">
+      <span class="nav-dir"> Previous</span>
+      <span class="nav-title">API Reference</span>
+    </a>
+    <a href="api-identity.html" class="next">
+      <span class="nav-dir">Next </span>
+      <span class="nav-title">Identity API</span>
+    </a>
+  </div>
+</main>
+</div>
+  <script src="_reveal.js"></script>
+<script src="_sidebar.js"></script>
+</body>
+</html>

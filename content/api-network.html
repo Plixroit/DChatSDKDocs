@@ -1,0 +1,184 @@
+<div class="topbar">
+  <div class="breadcrumb"><a href="#/intro" data-page="intro">DChat SDK</a> <span>></span> <a href="#/api-reference" data-page="api-reference">API Reference</a> <span>></span> Network</div>
+</div>
+
+<div class="page-header">
+  <h1>Network &amp; Node Operations</h1>
+  <p class="lead">Manage node connections, blockchain validation, and faucet funding.</p>
+</div>
+
+<div class="section">
+  <h2>Node Management</h2>
+  
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">CurrentNode</span>
+      <span class="method-return">NodeConfiguration?</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Gets the current active node configuration.</p>
+      <pre><span class="cls">NodeConfiguration</span>? node = sdk.CurrentNode;
+Console.<span class="met">WriteLine</span>(node?.GrpcEndpoint);</pre>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">AvailableNodes</span>
+      <span class="method-return">IReadOnlyList&lt;NodeConfiguration&gt;</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Gets the list of available node configurations provided during initialization.</p>
+      <pre><span class="kw">foreach</span> (<span class="kw">var</span> node <span class="kw">in</span> sdk.AvailableNodes) {
+    Console.<span class="met">WriteLine</span>($<span class="str">"{node.Name}: {node.GrpcEndpoint}"</span>);
+}</pre>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">SwitchNodeAsync</span>
+      <span class="method-return">Task</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Switches the active node configuration. May trigger a reconnection.</p>
+      <table class="param-table">
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>node</td><td>NodeConfiguration</td><td>Node configuration to switch to</td></tr>
+      </table>
+      <pre><span class="kw">var</span> newNode = sdk.AvailableNodes.First(n => n.Name == <span class="str">"backup"</span>);
+<span class="kw">await</span> sdk.<span class="met">SwitchNodeAsync</span>(newNode);</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Blockchain Operations</h2>
+  
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">ValidateAccountExistsAsync</span>
+      <span class="method-return">Task&lt;bool&gt;</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Validates that an account exists on the blockchain.</p>
+      <table class="param-table">
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>walletAddress</td><td>string</td><td>Wallet address to validate</td></tr>
+      </table>
+      <pre><span class="kw">bool</span> exists = <span class="kw">await</span> sdk.<span class="met">ValidateAccountExistsAsync</span>(walletAddress);
+<span class="kw">if</span> (!exists) {
+    <span class="cm">// Account not found on blockchain</span>
+}</pre>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">RegisterIdentityAsync</span>
+      <span class="method-return">Task&lt;BlockchainIdentityResult&gt;</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Registers an identity on the blockchain.</p>
+      <table class="param-table">
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>username</td><td>string</td><td>Desired username</td></tr>
+        <tr><td>keyPair</td><td>DChatChainKeyPair</td><td>Key pair for registration</td></tr>
+      </table>
+      <pre><span class="cls">BlockchainIdentityResult</span> result = <span class="kw">await</span> sdk.<span class="met">RegisterIdentityAsync</span>(username, keyPair);</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Faucet (Testnet)</h2>
+  
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">RequestFundingAsync</span>
+      <span class="method-return">Task&lt;FaucetResponse&gt;</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Requests funding for a key pair from the faucet service (testnet only).</p>
+      <table class="param-table">
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>keyPair</td><td>DChatChainKeyPair</td><td>Key pair to fund</td></tr>
+        <tr><td>username</td><td>string?</td><td>Optional username for memo</td></tr>
+      </table>
+      <pre><span class="cls">FaucetResponse</span> response = <span class="kw">await</span> sdk.<span class="met">RequestFundingAsync</span>(keyPair, username);
+<span class="kw">if</span> (response.Success) {
+    Console.<span class="met">WriteLine</span>($<span class="str">"Funded! TX: {response.TransactionHash}"</span>);
+}</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Failed Message Cache</h2>
+  
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">StoreFailedMessageId</span>
+      <span class="method-return">void</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Stores a failed message ID for retry after key exchange.</p>
+      <pre>sdk.<span class="met">StoreFailedMessageId</span>(senderDid, messageId);</pre>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">GetFailedMessageIds</span>
+      <span class="method-return">List&lt;string&gt;</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Gets all failed message IDs for a sender.</p>
+      <pre><span class="cls">List</span>&lt;<span class="kw">string</span>&gt; ids = sdk.<span class="met">GetFailedMessageIds</span>(senderDid);</pre>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">ClearFailedMessageIds</span>
+      <span class="method-return">void</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Clears specific failed message IDs after successful resend.</p>
+      <pre>sdk.<span class="met">ClearFailedMessageIds</span>(senderDid, messageIds);</pre>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">ClearAllFailedMessagesForSender</span>
+      <span class="method-return">void</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Clears all failed messages for a sender.</p>
+      <pre>sdk.<span class="met">ClearAllFailedMessagesForSender</span>(senderDid);</pre>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">ClearUserSession</span>
+      <span class="method-return">void</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Clears all cached keys and session information from memory. Call on user logout.</p>
+      <pre>sdk.<span class="met">ClearUserSession</span>();</pre>
+    </div>
+  </div>
+</div>
+
+<div class="page-nav">
+  <a href="#/api-media" data-page="api-media">
+    <span class="nav-dir"> Previous</span>
+    <span class="nav-title">Media &amp; IPFS API</span>
+  </a>
+  <a href="#/api-events" data-page="api-events" class="next">
+    <span class="nav-dir">Next </span>
+    <span class="nav-title">Events API</span>
+  </a>
+</div>

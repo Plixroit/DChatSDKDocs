@@ -1,0 +1,319 @@
+<div class="topbar">
+  <div class="breadcrumb"><a href="#/intro" data-page="intro">DChat SDK</a> <span>></span> <a href="#/api-reference" data-page="api-reference">API Reference</a> <span>></span> Messaging</div>
+</div>
+
+<div class="page-header">
+  <h1>Messaging Operations</h1>
+  <p class="lead">Send text, images, videos, audio, files, locations, and albums to individual contacts.</p>
+</div>
+
+<div class="section">
+  <h2>Core Send Methods</h2>
+  
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">SendMessageToWalletAsync</span>
+      <span class="method-return">Task&lt;bool&gt;</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Sends a typed message payload to a recipient. Use this for new code - wallet address is used for gRPC routing.</p>
+      <table class="param-table">
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>recipientWallet</td><td>string</td><td>Recipient's wallet address</td></tr>
+        <tr><td>payload</td><td>MessagePayload</td><td>Typed message content</td></tr>
+        <tr><td>recipientPubKey</td><td>string</td><td>Recipient's chat public key</td></tr>
+      </table>
+      <pre><span class="kw">var</span> payload = <span class="kw">new</span> <span class="cls">MessagePayload</span> { ... };
+<span class="kw">bool</span> sent = <span class="kw">await</span> sdk.<span class="met">SendMessageToWalletAsync</span>(recipientWallet, payload, recipientPubKey);</pre>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">SendEncryptedEnvelopeToWalletAsync</span>
+      <span class="method-return">Task&lt;bool&gt;</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Sends a pre-encrypted envelope directly. Caller is responsible for encryption.</p>
+      <pre><span class="kw">bool</span> sent = <span class="kw">await</span> sdk.<span class="met">SendEncryptedEnvelopeToWalletAsync</span>(recipientWallet, encryptedJson);</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Text Messages</h2>
+  
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">SendTextMessageAsync</span>
+      <span class="method-return">Task&lt;bool&gt;</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Sends a text message with optional reply support.</p>
+      <table class="param-table">
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>recipientWallet</td><td>string</td><td>Recipient's wallet address</td></tr>
+        <tr><td>content</td><td>string</td><td>Message text</td></tr>
+        <tr><td>senderDid</td><td>string</td><td>Sender's DID</td></tr>
+        <tr><td>recipientDid</td><td>string</td><td>Recipient's DID</td></tr>
+        <tr><td>chatId</td><td>string</td><td>Chat identifier</td></tr>
+        <tr><td>recipientPubKey</td><td>string</td><td>Recipient's chat public key</td></tr>
+        <tr><td>replyToMessageId</td><td>string?</td><td>Optional reply reference</td></tr>
+      </table>
+      <pre><span class="kw">await</span> sdk.<span class="met">SendTextMessageAsync</span>(
+    recipientWallet, 
+    content, 
+    senderDid, 
+    recipientDid, 
+    chatId, 
+    recipientPubKey,
+    replyToMessageId: <span class="kw">null</span>
+);</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Media Messages</h2>
+  
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">SendImageMessageAsync</span>
+      <span class="method-return">Task&lt;bool&gt;</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Sends an image message with IPFS upload. Encrypts and uploads the image, sends metadata envelope.</p>
+      <table class="param-table">
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>recipientWallet</td><td>string</td><td>Recipient's wallet address</td></tr>
+        <tr><td>imageData</td><td>byte[]</td><td>Image file bytes</td></tr>
+        <tr><td>thumbnailData</td><td>byte[]?</td><td>Optional thumbnail</td></tr>
+        <tr><td>width</td><td>int</td><td>Image width in pixels</td></tr>
+        <tr><td>height</td><td>int</td><td>Image height in pixels</td></tr>
+        <tr><td>senderDid</td><td>string</td><td>Sender's DID</td></tr>
+        <tr><td>recipientDid</td><td>string</td><td>Recipient's DID</td></tr>
+        <tr><td>chatId</td><td>string</td><td>Chat identifier</td></tr>
+        <tr><td>recipientPubKey</td><td>string</td><td>Recipient's chat public key</td></tr>
+        <tr><td>caption</td><td>string?</td><td>Optional caption</td></tr>
+      </table>
+      <pre><span class="kw">await</span> sdk.<span class="met">SendImageMessageAsync</span>(
+    recipientWallet, imageData, thumbnailData, width, height,
+    senderDid, recipientDid, chatId, recipientPubKey, caption
+);</pre>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">SendVideoMessageAsync</span>
+      <span class="method-return">Task&lt;bool&gt;</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Sends a video message with IPFS upload.</p>
+      <table class="param-table">
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>recipientWallet</td><td>string</td><td>Recipient's wallet address</td></tr>
+        <tr><td>videoData</td><td>byte[]</td><td>Video file bytes</td></tr>
+        <tr><td>thumbnailData</td><td>byte[]?</td><td>Optional thumbnail</td></tr>
+        <tr><td>width</td><td>int</td><td>Video width in pixels</td></tr>
+        <tr><td>height</td><td>int</td><td>Video height in pixels</td></tr>
+        <tr><td>durationSeconds</td><td>int</td><td>Video duration</td></tr>
+        <tr><td>filename</td><td>string</td><td>Original filename</td></tr>
+        <tr><td>senderDid</td><td>string</td><td>Sender's DID</td></tr>
+        <tr><td>recipientDid</td><td>string</td><td>Recipient's DID</td></tr>
+        <tr><td>chatId</td><td>string</td><td>Chat identifier</td></tr>
+        <tr><td>recipientPubKey</td><td>string</td><td>Recipient's chat public key</td></tr>
+        <tr><td>caption</td><td>string?</td><td>Optional caption</td></tr>
+      </table>
+      <pre><span class="kw">await</span> sdk.<span class="met">SendVideoMessageAsync</span>(
+    recipientWallet, videoData, thumbnailData, width, height, durationSeconds, filename,
+    senderDid, recipientDid, chatId, recipientPubKey, caption
+);</pre>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">SendAudioMessageAsync</span>
+      <span class="method-return">Task&lt;bool&gt;</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Sends an audio/voice message with IPFS upload.</p>
+      <table class="param-table">
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>recipientWallet</td><td>string</td><td>Recipient's wallet address</td></tr>
+        <tr><td>audioData</td><td>byte[]</td><td>Audio file bytes</td></tr>
+        <tr><td>durationSeconds</td><td>int</td><td>Audio duration</td></tr>
+        <tr><td>filename</td><td>string</td><td>Original filename</td></tr>
+        <tr><td>senderDid</td><td>string</td><td>Sender's DID</td></tr>
+        <tr><td>recipientDid</td><td>string</td><td>Recipient's DID</td></tr>
+        <tr><td>chatId</td><td>string</td><td>Chat identifier</td></tr>
+        <tr><td>recipientPubKey</td><td>string</td><td>Recipient's chat public key</td></tr>
+        <tr><td>waveformData</td><td>byte[]?</td><td>Optional waveform visualization</td></tr>
+        <tr><td>isVoiceMessage</td><td>bool</td><td>True for voice note</td></tr>
+      </table>
+      <pre><span class="kw">await</span> sdk.<span class="met">SendAudioMessageAsync</span>(
+    recipientWallet, audioData, durationSeconds, filename,
+    senderDid, recipientDid, chatId, recipientPubKey,
+    waveformData: <span class="kw">null</span>, isVoiceMessage: <span class="kw">true</span>
+);</pre>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">SendFileMessageAsync</span>
+      <span class="method-return">Task&lt;bool&gt;</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Sends a file attachment with IPFS upload.</p>
+      <table class="param-table">
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>recipientWallet</td><td>string</td><td>Recipient's wallet address</td></tr>
+        <tr><td>fileData</td><td>byte[]</td><td>File bytes</td></tr>
+        <tr><td>filename</td><td>string</td><td>Original filename</td></tr>
+        <tr><td>senderDid</td><td>string</td><td>Sender's DID</td></tr>
+        <tr><td>recipientDid</td><td>string</td><td>Recipient's DID</td></tr>
+        <tr><td>chatId</td><td>string</td><td>Chat identifier</td></tr>
+        <tr><td>recipientPubKey</td><td>string</td><td>Recipient's chat public key</td></tr>
+        <tr><td>caption</td><td>string?</td><td>Optional caption</td></tr>
+      </table>
+      <pre><span class="kw">await</span> sdk.<span class="met">SendFileMessageAsync</span>(
+    recipientWallet, fileData, filename,
+    senderDid, recipientDid, chatId, recipientPubKey, caption
+);</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Location Messages</h2>
+  
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">SendLocationMessageAsync</span>
+      <span class="method-return">Task&lt;bool&gt;</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Sends a location message with coordinates and optional address.</p>
+      <table class="param-table">
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>recipientWallet</td><td>string</td><td>Recipient's wallet address</td></tr>
+        <tr><td>latitude</td><td>double</td><td>Latitude coordinate</td></tr>
+        <tr><td>longitude</td><td>double</td><td>Longitude coordinate</td></tr>
+        <tr><td>senderDid</td><td>string</td><td>Sender's DID</td></tr>
+        <tr><td>recipientDid</td><td>string</td><td>Recipient's DID</td></tr>
+        <tr><td>chatId</td><td>string</td><td>Chat identifier</td></tr>
+        <tr><td>recipientPubKey</td><td>string</td><td>Recipient's chat public key</td></tr>
+        <tr><td>address</td><td>string?</td><td>Optional address string</td></tr>
+        <tr><td>locationName</td><td>string?</td><td>Optional location name</td></tr>
+      </table>
+      <pre><span class="kw">await</span> sdk.<span class="met">SendLocationMessageAsync</span>(
+    recipientWallet, latitude, longitude,
+    senderDid, recipientDid, chatId, recipientPubKey,
+    address: <span class="str">"123 Main St"</span>, locationName: <span class="str">"Office"</span>
+);</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Album Messages</h2>
+  
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">SendAlbumMessageAsync</span>
+      <span class="method-return">Task&lt;bool&gt;</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Sends a multi-image album as ONE message. Uploads all items to IPFS in parallel.</p>
+      <table class="param-table">
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>recipientWallet</td><td>string</td><td>Recipient's wallet address</td></tr>
+        <tr><td>items</td><td>List&lt;AlbumImageInput&gt;</td><td>List of album items</td></tr>
+        <tr><td>senderDid</td><td>string</td><td>Sender's DID</td></tr>
+        <tr><td>recipientDid</td><td>string</td><td>Recipient's DID</td></tr>
+        <tr><td>chatId</td><td>string</td><td>Chat identifier</td></tr>
+        <tr><td>recipientPubKey</td><td>string</td><td>Recipient's chat public key</td></tr>
+      </table>
+      <pre><span class="kw">var</span> items = <span class="kw">new</span> <span class="cls">List</span>&lt;<span class="cls">AlbumImageInput</span>&gt;
+{
+    <span class="kw">new</span> { ImageData = img1, Width = 800, Height = 600 },
+    <span class="kw">new</span> { ImageData = img2, Width = 1024, Height = 768 }
+};
+<span class="kw">await</span> sdk.<span class="met">SendAlbumMessageAsync</span>(recipientWallet, items, senderDid, recipientDid, chatId, recipientPubKey);</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Message Actions</h2>
+  
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">SendEditMessageAsync</span>
+      <span class="method-return">Task&lt;bool&gt;</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Sends a message edit notification.</p>
+      <pre><span class="kw">await</span> sdk.<span class="met">SendEditMessageAsync</span>(recipientWallet, messageId, newContent, recipientPubKey, recipientDid, chatId);</pre>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">SendDeleteMessageAsync</span>
+      <span class="method-return">Task&lt;bool&gt;</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Sends a message delete notification.</p>
+      <pre><span class="kw">await</span> sdk.<span class="met">SendDeleteMessageAsync</span>(recipientWallet, messageId, recipientPubKey, recipientDid, deletedBy, chatId);</pre>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">SendPinMessageAsync</span>
+      <span class="method-return">Task&lt;bool&gt;</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Sends a message pin/unpin notification.</p>
+      <pre><span class="kw">await</span> sdk.<span class="met">SendPinMessageAsync</span>(recipientWallet, targetMessageId, isPinned, chatId, recipientPubKey, recipientDid);</pre>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">SendReactionMessageAsync</span>
+      <span class="method-return">Task&lt;bool&gt;</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Sends a reaction (emoji) on a message. reactionKey is a Lottie asset key like "like", "love", "haha".</p>
+      <pre><span class="kw">await</span> sdk.<span class="met">SendReactionMessageAsync</span>(
+    recipientWallet, targetMessageId, <span class="str">"love"</span>, ReactionAction.Add, 
+    chatId, recipientPubKey, recipientDid);</pre>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">IsGroupChatAsync</span>
+      <span class="method-return">Task&lt;bool&gt;</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Check if a chatId corresponds to a group chat.</p>
+      <pre><span class="kw">bool</span> isGroup = <span class="kw">await</span> sdk.<span class="met">IsGroupChatAsync</span>(chatId);</pre>
+    </div>
+  </div>
+</div>
+
+<div class="page-nav">
+  <a href="#/api-group-keys" data-page="api-group-keys">
+    <span class="nav-dir"> Previous</span>
+    <span class="nav-title">Group Keys API</span>
+  </a>
+  <a href="#/api-group-messaging" data-page="api-group-messaging" class="next">
+    <span class="nav-dir">Next </span>
+    <span class="nav-title">Group Messaging API</span>
+  </a>
+</div>

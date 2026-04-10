@@ -1,0 +1,43 @@
+<!-- Shared sidebar snippet  included via JS in each page -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<aside class="sidebar">
+  <a href="index.html" class="sidebar-logo">
+    <div class="logo-icon"><img src="Dchat.svg" alt="DChat"></div>
+    <div>
+      <div class="logo-text">DChat SDK</div>
+      <div class="logo-sub">Developer Docs</div>
+    </div>
+  </a>
+
+  <nav>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Overview</div>
+      <a href="index.html"          data-page="index"><i class="nav-icon fa-solid fa-house"></i> Introduction</a>
+      <a href="getting-started.html" data-page="getting-started"><i class="nav-icon fa-solid fa-rocket"></i> Getting Started</a>
+      <a href="configuration.html"  data-page="configuration"><i class="nav-icon fa-solid fa-gear"></i> Configuration</a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Core APIs</div>
+      <a href="identity.html"   data-page="identity"><i class="nav-icon fa-solid fa-id-card"></i> Identity &amp; Keys</a>
+      <a href="encryption.html" data-page="encryption"><i class="nav-icon fa-solid fa-lock"></i> Encryption</a>
+      <a href="messaging.html"  data-page="messaging"><i class="nav-icon fa-solid fa-message"></i> Messaging</a>
+      <a href="groups.html"     data-page="groups"><i class="nav-icon fa-solid fa-users"></i> Groups</a>
+      <a href="streaming.html"  data-page="streaming"><i class="nav-icon fa-solid fa-tower-broadcast"></i> Streaming</a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Reference</div>
+      <a href="message-types.html" data-page="message-types"><i class="nav-icon fa-solid fa-list"></i> Message Types</a>
+    </div>
+  </nav>
+</aside>
+
+<script>
+  // Mark active nav link
+  const page = document.currentScript.getAttribute('data-active');
+  document.querySelectorAll('.sidebar nav a').forEach(a => {
+    if (a.dataset.page === page) a.classList.add('active');
+  });
+</script>
+

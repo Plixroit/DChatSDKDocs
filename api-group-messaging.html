@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Group Messaging API - DChat SDK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link rel="stylesheet" href="_shared.css"/>
+</head>
+<body>
+
+<div class="layout-wrapper">
+<aside class="sidebar">
+  <a href="index.html" class="sidebar-logo">
+    <div class="logo-icon"><img src="Dchat.svg" alt="DChat"></div>
+    <div><div class="logo-text">DChat SDK</div><div class="logo-sub">Developer Docs</div></div>
+  </a>
+  <nav>
+    <div class="sidebar-section"><div class="sidebar-section-title">Overview</div>
+      <a href="index.html"><i class="nav-icon fa-solid fa-house"></i> Introduction</a>
+      <a href="getting-started.html"><i class="nav-icon fa-solid fa-rocket"></i> Getting Started</a>
+      <a href="configuration.html"><i class="nav-icon fa-solid fa-gear"></i> Configuration</a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-section-title">Core APIs</div>
+      <a href="identity.html"><i class="nav-icon fa-solid fa-id-card"></i> Identity &amp; Keys</a>
+      <a href="encryption.html"><i class="nav-icon fa-solid fa-lock"></i> Encryption</a>
+      <a href="messaging.html"><i class="nav-icon fa-solid fa-message"></i> Messaging</a>
+      <a href="groups.html"><i class="nav-icon fa-solid fa-users"></i> Groups</a>
+      <a href="streaming.html"><i class="nav-icon fa-solid fa-tower-broadcast"></i> Streaming</a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-section-title">Reference</div>
+      <a href="message-types.html"><i class="nav-icon fa-solid fa-list"></i> Message Types</a>
+      <a href="api-reference.html"><i class="nav-icon fa-solid fa-code"></i> API Reference</a>
+      <div class="sidebar-submenu">
+        <a href="api-connection.html"><i class="nav-icon fa-solid fa-plug"></i> Connection</a>
+        <a href="api-identity.html"><i class="nav-icon fa-solid fa-id-card"></i> Identity</a>
+        <a href="api-chat-keys.html"><i class="nav-icon fa-solid fa-key"></i> Chat Keys</a>
+        <a href="api-encryption.html"><i class="nav-icon fa-solid fa-lock"></i> Encryption</a>
+        <a href="api-group-keys.html"><i class="nav-icon fa-solid fa-users-gear"></i> Group Keys</a>
+        <a href="api-messaging.html"><i class="nav-icon fa-solid fa-paper-plane"></i> Messaging</a>
+        <a href="api-group-messaging.html" class="active"><i class="nav-icon fa-solid fa-users"></i> Group Messaging</a>
+        <a href="api-group-control.html"><i class="nav-icon fa-solid fa-user-gear"></i> Group Control</a>
+        <a href="api-contact.html"><i class="nav-icon fa-solid fa-address-book"></i> Contacts &amp; Profile</a>
+        <a href="api-presence.html"><i class="nav-icon fa-solid fa-circle-dot"></i> Presence</a>
+        <a href="api-media.html"><i class="nav-icon fa-solid fa-photo-film"></i> Media &amp; IPFS</a>
+        <a href="api-network.html"><i class="nav-icon fa-solid fa-network-wired"></i> Network</a>
+        <a href="api-events.html"><i class="nav-icon fa-solid fa-bolt"></i> Events</a>
+      </div>
+    </div>
+  </nav>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="breadcrumb"><a href="index.html">DChat SDK</a> <span></span> <a href="api-reference.html">API Reference</a> <span></span> Group Messaging</div>
+  </div>
+
+  <div class="page-header">
+    <h1>Group Messaging Operations</h1>
+    <p class="lead">Send messages to groups using sender-key encryption for efficient E2EE.</p>
+  </div>
+
+  <div class="section">
+    <h2>Overview</h2>
+    <p>Group messages use sender-key encryption: each member has their own symmetric key that they distribute to all other members via E2E encrypted envelopes. This allows efficient broadcast encryption without re-keying on member changes.</p>
+  </div>
+
+  <div class="section">
+    <h2>Send Methods</h2>
+    
+    <div class="method-block">
+      <div class="method-header">
+        <span class="method-name">SendGroupMessageAsync</span>
+        <span class="method-return">Task&lt;bool&gt;</span>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Sends a message to all members of a group using sender key encryption.</p>
+        <table class="param-table">
+          <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+          <tr><td>groupId</td><td>string</td><td>Group identifier</td></tr>
+          <tr><td>payload</td><td>MessagePayload</td><td>Typed message content</td></tr>
+          <tr><td>senderDid</td><td>string</td><td>Sender's DID</td></tr>
+        </table>
+        <pre><span class="kw">await</span> sdk.<span class="met">SendGroupMessageAsync</span>(groupId, payload, senderDid);</pre>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <span class="method-name">SendGroupImageMessageAsync</span>
+        <span class="method-return">Task&lt;bool&gt;</span>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Sends an image message to a group using sender-key encryption.</p>
+        <table class="param-table">
+          <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+          <tr><td>groupId</td><td>string</td><td>Group identifier</td></tr>
+          <tr><td>imageData</td><td>byte[]</td><td>Image file bytes</td></tr>
+          <tr><td>thumbnailData</td><td>byte[]?</td><td>Optional thumbnail</td></tr>
+          <tr><td>width</td><td>int</td><td>Image width</td></tr>
+          <tr><td>height</td><td>int</td><td>Image height</td></tr>
+          <tr><td>senderDid</td><td>string</td><td>Sender's DID</td></tr>
+          <tr><td>caption</td><td>string?</td><td>Optional caption</td></tr>
+        </table>
+        <pre><span class="kw">await</span> sdk.<span class="met">SendGroupImageMessageAsync</span>(
+    groupId, imageData, thumbnailData, width, height, senderDid, caption
+);</pre>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <span class="method-name">SendGroupVideoMessageAsync</span>
+        <span class="method-return">Task&lt;bool&gt;</span>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Sends a video message to a group using sender-key encryption.</p>
+        <table class="param-table">
+          <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+          <tr><td>groupId</td><td>string</td><td>Group identifier</td></tr>
+          <tr><td>videoData</td><td>byte[]</td><td>Video file bytes</td></tr>
+          <tr><td>thumbnailData</td><td>byte[]?</td><td>Optional thumbnail</td></tr>
+          <tr><td>width</td><td>int</td><td>Video width</td></tr>
+          <tr><td>height</td><td>int</td><td>Video height</td></tr>
+          <tr><td>durationSeconds</td><td>int</td><td>Video duration</td></tr>
+          <tr><td>filename</td><td>string</td><td>Original filename</td></tr>
+          <tr><td>senderDid</td><td>string</td><td>Sender's DID</td></tr>
+          <tr><td>caption</td><td>string?</td><td>Optional caption</td></tr>
+        </table>
+        <pre><span class="kw">await</span> sdk.<span class="met">SendGroupVideoMessageAsync</span>(
+    groupId, videoData, thumbnailData, width, height, durationSeconds, filename, senderDid, caption
+);</pre>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <span class="method-name">SendGroupAudioMessageAsync</span>
+        <span class="method-return">Task&lt;bool&gt;</span>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Sends an audio message to a group using sender-key encryption.</p>
+        <table class="param-table">
+          <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+          <tr><td>groupId</td><td>string</td><td>Group identifier</td></tr>
+          <tr><td>audioData</td><td>byte[]</td><td>Audio file bytes</td></tr>
+          <tr><td>durationSeconds</td><td>int</td><td>Audio duration</td></tr>
+          <tr><td>filename</td><td>string</td><td>Original filename</td></tr>
+          <tr><td>senderDid</td><td>string</td><td>Sender's DID</td></tr>
+          <tr><td>waveformData</td><td>byte[]?</td><td>Optional waveform</td></tr>
+          <tr><td>isVoiceMessage</td><td>bool</td><td>True for voice note</td></tr>
+        </table>
+        <pre><span class="kw">await</span> sdk.<span class="met">SendGroupAudioMessageAsync</span>(
+    groupId, audioData, durationSeconds, filename, senderDid, waveformData, isVoiceMessage: <span class="kw">true</span>
+);</pre>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <span class="method-name">SendGroupFileMessageAsync</span>
+        <span class="method-return">Task&lt;bool&gt;</span>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Sends a file message to a group using sender-key encryption.</p>
+        <table class="param-table">
+          <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+          <tr><td>groupId</td><td>string</td><td>Group identifier</td></tr>
+          <tr><td>fileData</td><td>byte[]</td><td>File bytes</td></tr>
+          <tr><td>filename</td><td>string</td><td>Original filename</td></tr>
+          <tr><td>senderDid</td><td>string</td><td>Sender's DID</td></tr>
+          <tr><td>caption</td><td>string?</td><td>Optional caption</td></tr>
+        </table>
+        <pre><span class="kw">await</span> sdk.<span class="met">SendGroupFileMessageAsync</span>(groupId, fileData, filename, senderDid, caption);</pre>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <span class="method-name">SendGroupLocationMessageAsync</span>
+        <span class="method-return">Task&lt;bool&gt;</span>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Sends a location message to a group.</p>
+        <table class="param-table">
+          <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+          <tr><td>groupId</td><td>string</td><td>Group identifier</td></tr>
+          <tr><td>latitude</td><td>double</td><td>Latitude coordinate</td></tr>
+          <tr><td>longitude</td><td>double</td><td>Longitude coordinate</td></tr>
+          <tr><td>senderDid</td><td>string</td><td>Sender's DID</td></tr>
+          <tr><td>address</td><td>string?</td><td>Optional address</td></tr>
+          <tr><td>locationName</td><td>string?</td><td>Optional location name</td></tr>
+        </table>
+        <pre><span class="kw">await</span> sdk.<span class="met">SendGroupLocationMessageAsync</span>(
+    groupId, latitude, longitude, senderDid, address, locationName
+);</pre>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <span class="method-name">SendGroupAlbumMessageAsync</span>
+        <span class="method-return">Task&lt;bool&gt;</span>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Sends a multi-image album to a group using sender-key encryption.</p>
+        <table class="param-table">
+          <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+          <tr><td>groupId</td><td>string</td><td>Group identifier</td></tr>
+          <tr><td>items</td><td>List&lt;AlbumImageInput&gt;</td><td>List of album items</td></tr>
+          <tr><td>senderDid</td><td>string</td><td>Sender's DID</td></tr>
+          <tr><td>caption</td><td>string?</td><td>Optional caption</td></tr>
+        </table>
+        <pre><span class="kw">await</span> sdk.<span class="met">SendGroupAlbumMessageAsync</span>(groupId, items, senderDid, caption);</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Download</h2>
+    
+    <div class="method-block">
+      <div class="method-header">
+        <span class="method-name">DownloadGroupMediaAsync</span>
+        <span class="method-return">Task&lt;byte[]&gt;</span>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Downloads a group media file from IPFS and decrypts it with the sender's sender key.</p>
+        <table class="param-table">
+          <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+          <tr><td>ipfsCid</td><td>string</td><td>IPFS content identifier</td></tr>
+          <tr><td>senderDid</td><td>string</td><td>DID of the message sender</td></tr>
+          <tr><td>groupId</td><td>string</td><td>Group identifier</td></tr>
+          <tr><td>mnemonic</td><td>string</td><td>Mnemonic for signing request</td></tr>
+        </table>
+        <pre><span class="kw">byte</span>[] media = <span class="kw">await</span> sdk.<span class="met">DownloadGroupMediaAsync</span>(ipfsCid, senderDid, groupId, mnemonic);</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <a href="api-messaging.html">
+      <span class="nav-dir"> Previous</span>
+      <span class="nav-title">Messaging API</span>
+    </a>
+    <a href="api-group-control.html" class="next">
+      <span class="nav-dir">Next </span>
+      <span class="nav-title">Group Control API</span>
+    </a>
+  </div>
+</main>
+</div>
+  <script src="_reveal.js"></script>
+<script src="_sidebar.js"></script>
+</body>
+</html>

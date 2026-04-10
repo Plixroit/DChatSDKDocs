@@ -1,0 +1,162 @@
+<div class="topbar">
+  <div class="breadcrumb"><a href="#/intro" data-page="intro">DChat SDK</a> <span>></span> <a href="#/api-reference" data-page="api-reference">API Reference</a> <span>></span> Group Keys</div>
+</div>
+
+<div class="page-header">
+  <h1>Group Key Operations</h1>
+  <p class="lead">Symmetric group keys and sender key management for group messaging.</p>
+</div>
+
+<div class="section">
+  <h2>Overview</h2>
+  <p>Group chats use two types of symmetric keys:</p>
+  <ul>
+    <li><strong>Group Key:</strong> Shared symmetric key for the entire group (legacy, being deprecated)</li>
+    <li><strong>Sender Key:</strong> Per-member-per-group key for sender-key encryption (recommended)</li>
+  </ul>
+  <p>Sender keys allow each member to encrypt messages with their own key, avoiding the need to distribute a new group key on every member change.</p>
+</div>
+
+<div class="section">
+  <h2>Group Keys (Legacy)</h2>
+  
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">StoreGroupKeyAsync</span>
+      <span class="method-return">Task</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Stores a symmetric group key keyed by group ID.</p>
+      <table class="param-table">
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>groupId</td><td>string</td><td>Group identifier</td></tr>
+        <tr><td>symmetricKeyBase64</td><td>string</td><td>AES-256 key (base64)</td></tr>
+        <tr><td>keyGeneration</td><td>int</td><td>Key version number</td></tr>
+      </table>
+      <pre><span class="kw">await</span> sdk.<span class="met">StoreGroupKeyAsync</span>(groupId, symmetricKeyBase64, keyGeneration: <span class="num">1</span>);</pre>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">GetGroupKeyAsync</span>
+      <span class="method-return">Task&lt;string?&gt;</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Retrieves a symmetric group key by group ID.</p>
+      <pre><span class="kw">string</span>? key = <span class="kw">await</span> sdk.<span class="met">GetGroupKeyAsync</span>(groupId);</pre>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">DeleteGroupKeyAsync</span>
+      <span class="method-return">Task</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Deletes a stored symmetric group key.</p>
+      <pre><span class="kw">await</span> sdk.<span class="met">DeleteGroupKeyAsync</span>(groupId);</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Sender Keys (Recommended)</h2>
+  
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">GenerateSenderKeyAsync</span>
+      <span class="method-return">Task&lt;string&gt;</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Generates a new sender key for a group member. Returns base64-encoded AES-256 key.</p>
+      <table class="param-table">
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>ownerDid</td><td>string</td><td>DID of the key owner</td></tr>
+        <tr><td>groupId</td><td>string</td><td>Group identifier</td></tr>
+      </table>
+      <pre><span class="kw">string</span> senderKey = <span class="kw">await</span> sdk.<span class="met">GenerateSenderKeyAsync</span>(ownerDid, groupId);</pre>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">StoreSenderKeyAsync</span>
+      <span class="method-return">Task</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Stores a sender key for a specific member/group tuple.</p>
+      <table class="param-table">
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>ownerDid</td><td>string</td><td>DID of the key owner</td></tr>
+        <tr><td>groupId</td><td>string</td><td>Group identifier</td></tr>
+        <tr><td>senderKeyBase64</td><td>string</td><td>AES-256 key (base64)</td></tr>
+      </table>
+      <pre><span class="kw">await</span> sdk.<span class="met">StoreSenderKeyAsync</span>(ownerDid, groupId, senderKeyBase64);</pre>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">GetSenderKeyAsync</span>
+      <span class="method-return">Task&lt;string?&gt;</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Retrieves a sender key for a specific member/group tuple.</p>
+      <pre><span class="kw">string</span>? key = <span class="kw">await</span> sdk.<span class="met">GetSenderKeyAsync</span>(ownerDid, groupId);</pre>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">DeleteSenderKeyAsync</span>
+      <span class="method-return">Task</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Deletes a sender key for a specific member/group tuple.</p>
+      <pre><span class="kw">await</span> sdk.<span class="met">DeleteSenderKeyAsync</span>(ownerDid, groupId);</pre>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">IncrementSenderKeyMessageCountAsync</span>
+      <span class="method-return">Task&lt;bool&gt;</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Increments message count and checks if sender key rotation is needed. Returns true if rotation threshold reached.</p>
+      <pre><span class="kw">bool</span> needsRotation = <span class="kw">await</span> sdk.<span class="met">IncrementSenderKeyMessageCountAsync</span>(ownerDid, groupId);
+<span class="kw">if</span> (needsRotation) {
+    <span class="cm">// Rotate and redistribute</span>
+}</pre>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">RotateSenderKeyAsync</span>
+      <span class="method-return">Task&lt;bool&gt;</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Rotates a sender key and distributes the new key to all group members.</p>
+      <table class="param-table">
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>groupId</td><td>string</td><td>Group identifier</td></tr>
+        <tr><td>memberDid</td><td>string</td><td>DID of member whose key is rotating</td></tr>
+        <tr><td>reason</td><td>string</td><td>Reason for rotation</td></tr>
+      </table>
+      <pre><span class="kw">await</span> sdk.<span class="met">RotateSenderKeyAsync</span>(groupId, memberDid, <span class="str">"scheduled"</span>);</pre>
+    </div>
+  </div>
+</div>
+
+<div class="page-nav">
+  <a href="#/api-encryption" data-page="api-encryption">
+    <span class="nav-dir"> Previous</span>
+    <span class="nav-title">Encryption API</span>
+  </a>
+  <a href="#/api-messaging" data-page="api-messaging" class="next">
+    <span class="nav-dir">Next </span>
+    <span class="nav-title">Messaging API</span>
+  </a>
+</div>

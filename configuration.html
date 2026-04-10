@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Configuration  DChat SDK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link rel="stylesheet" href="_shared.css"/>
+</head>
+<body>
+
+<div class="layout-wrapper">
+<aside class="sidebar">
+  <a href="index.html" class="sidebar-logo">
+    <div class="logo-icon"><img src="Dchat.svg" alt="DChat"></div>
+    <div><div class="logo-text">DChat SDK</div><div class="logo-sub">Developer Docs</div></div>
+  </a>
+  <nav>
+    <div class="sidebar-section"><div class="sidebar-section-title">Overview</div>
+      <a href="index.html"><i class="nav-icon fa-solid fa-house"></i> Introduction</a>
+      <a href="getting-started.html"><i class="nav-icon fa-solid fa-rocket"></i> Getting Started</a>
+      <a href="configuration.html" class="active"><i class="nav-icon fa-solid fa-gear"></i> Configuration</a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-section-title">Core APIs</div>
+      <a href="identity.html"><i class="nav-icon fa-solid fa-id-card"></i> Identity &amp; Keys</a>
+      <a href="encryption.html"><i class="nav-icon fa-solid fa-lock"></i> Encryption</a>
+      <a href="messaging.html"><i class="nav-icon fa-solid fa-message"></i> Messaging</a>
+      <a href="groups.html"><i class="nav-icon fa-solid fa-users"></i> Groups</a>
+      <a href="streaming.html"><i class="nav-icon fa-solid fa-tower-broadcast"></i> Streaming</a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-section-title">Reference</div>
+      <a href="message-types.html"><i class="nav-icon fa-solid fa-list"></i> Message Types</a>
+      <a href="api-reference.html" class="sidebar-toggle"><i class="nav-icon fa-solid fa-code"></i> API Reference</a>
+      <div class="sidebar-submenu">
+        <a href="api-connection.html"><i class="nav-icon fa-solid fa-plug"></i> Connection</a>
+        <a href="api-identity.html"><i class="nav-icon fa-solid fa-id-card"></i> Identity</a>
+        <a href="api-chat-keys.html"><i class="nav-icon fa-solid fa-key"></i> Chat Keys</a>
+        <a href="api-encryption.html"><i class="nav-icon fa-solid fa-lock"></i> Encryption</a>
+        <a href="api-group-keys.html"><i class="nav-icon fa-solid fa-users-gear"></i> Group Keys</a>
+        <a href="api-messaging.html"><i class="nav-icon fa-solid fa-paper-plane"></i> Messaging</a>
+        <a href="api-group-messaging.html"><i class="nav-icon fa-solid fa-users"></i> Group Messaging</a>
+        <a href="api-group-control.html"><i class="nav-icon fa-solid fa-user-gear"></i> Group Control</a>
+        <a href="api-contact.html"><i class="nav-icon fa-solid fa-address-book"></i> Contacts</a>
+        <a href="api-presence.html"><i class="nav-icon fa-solid fa-circle-dot"></i> Presence</a>
+        <a href="api-media.html"><i class="nav-icon fa-solid fa-photo-film"></i> Media</a>
+        <a href="api-network.html"><i class="nav-icon fa-solid fa-network-wired"></i> Network</a>
+        <a href="api-events.html"><i class="nav-icon fa-solid fa-bolt"></i> Events</a>
+      </div>
+    </div>
+  </nav>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="breadcrumb"><a href="index.html">DChat SDK</a> <span></span> Configuration</div>
+  </div>
+
+  <div class="page-header">
+    <h1>Configuration</h1>
+    <p class="lead">All SDK behaviour is controlled via <code>DChatSdkOptions</code>, built with a fluent builder. This page documents every option and how to choose its value.</p>
+  </div>
+
+  <!-- Builder pattern -->
+  <div class="section">
+    <h2>DChatSdkOptionsBuilder</h2>
+    <p>Create an options instance with the static factory <code>DChatSdkOptions.CreateBuilder()</code>. The builder validates required fields and throws <code>InvalidOperationException</code> if mandatory options are missing when you call <code>Build()</code>.</p>
+
+    <pre><span class="cls">DChatSdkOptions</span> options = <span class="cls">DChatSdkOptions</span>.<span class="met">CreateBuilder</span>()
+    .<span class="met">AddNode</span>(<span class="kw">new</span> <span class="cls">NodeConfiguration</span>(
+        blockchainRpcUrl: <span class="str">"https://rpc.dchat.network"</span>,
+        grpcServerUrl:    <span class="str">"https://grpc.dchat.network"</span>,
+        middlewareApiUrl: <span class="str">"https://api.dchat.network"</span>,
+        name:             <span class="str">"mainnet"</span>))
+    .<span class="met">SetChatKeyRotationPolicy</span>(<span class="kw">new</span> <span class="cls">KeyRotationPolicy</span>
+    {
+        MaxMessageCount = <span class="num">5000</span>,
+        MaxAgeDays      = <span class="num">14</span>
+    })
+    .<span class="met">SetGrpcMaxMessageSize</span>(<span class="num">8 * 1024 * 1024</span>)  <span class="cm">// 8 MB</span>
+    .<span class="met">SetGroupMemberProvider</span>(myProvider)
+    .<span class="met">Build</span>();</pre>
+
+    <div class="callout info">
+      <span class="callout-icon"><i class="fa-solid fa-circle-info"></i></span>
+      <div class="callout-body">When <code>AddNode()</code> is used, the builder auto-fills <code>blockchainRpcUrl</code>, <code>grpcServerUrl</code>, and <code>middlewareApiUrl</code> from the first node if they have not been set explicitly. You can override any individual URL after calling <code>AddNode()</code>.</div>
+    </div>
+  </div>
+
+  <!-- Builder methods -->
+  <div class="section">
+    <h2>Builder Methods</h2>
+
+    <div class="method-block">
+      <div class="method-header">
+        <div class="method-sig">
+          <span class="ret">DChatSdkOptionsBuilder</span> <span class="name">SetMiddlewareApiUrl</span>(<span class="type">string</span> <span class="param">middlewareApiUrl</span>)
+        </div>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Sets the base URL for the authenticated middleware API. Used for IPFS uploads, identity lookups, and profile operations. Overrides the URL sourced from <code>AddNode()</code>.</p>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <div class="method-sig">
+          <span class="ret">DChatSdkOptionsBuilder</span> <span class="name">SetGrpcServerUrl</span>(<span class="type">string</span> <span class="param">grpcServerUrl</span>)
+        </div>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Sets the gRPC server URL for the bidirectional message stream. Must be reachable from the device and support HTTP/2.</p>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <div class="method-sig">
+          <span class="ret">DChatSdkOptionsBuilder</span> <span class="name">SetBlockchainRpcUrl</span>(<span class="type">string</span> <span class="param">rpcUrl</span>)
+        </div>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Sets the Cosmos/CometBFT RPC endpoint for identity registration and on-chain queries. Required for username registration and DID lookup.</p>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <div class="method-sig">
+          <span class="ret">DChatSdkOptionsBuilder</span> <span class="name">SetGrpcMaxMessageSize</span>(<span class="type">int</span> <span class="param">maxSize</span>)
+        </div>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Maximum gRPC message size in bytes. Defaults to <code>4 MB</code>. Increase to <code>816 MB</code> if you plan to send large file chunks directly over the stream.</p>
+        <table class="param-table">
+          <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+          <tr><td>maxSize</td><td>int</td><td>Byte limit (must be &gt; 0). Default: <code>4194304</code>.</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <div class="method-sig">
+          <span class="ret">DChatSdkOptionsBuilder</span> <span class="name">SetGrpcKeepAliveInterval</span>(<span class="type">TimeSpan</span> <span class="param">interval</span>)
+        </div>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">How often the gRPC channel sends HTTP/2 PING frames to keep NAT mappings alive. Default: <code>60 s</code>. Reduce to <code>2030 s</code> on mobile networks with aggressive NAT timeouts.</p>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <div class="method-sig">
+          <span class="ret">DChatSdkOptionsBuilder</span> <span class="name">SetGrpcConnectionTimeout</span>(<span class="type">TimeSpan</span> <span class="param">timeout</span>)
+        </div>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Maximum time to wait when establishing the gRPC connection. Default: <code>30 s</code>.</p>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <div class="method-sig">
+          <span class="ret">DChatSdkOptionsBuilder</span> <span class="name">SetChatKeyRotationPolicy</span>(<span class="type">KeyRotationPolicy</span> <span class="param">policy</span>)
+        </div>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Configures when E2EE chat keys are automatically rotated for forward secrecy. See <a href="encryption.html" style="color:var(--accent)">Encryption  Key Rotation</a> for full details.</p>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <div class="method-sig">
+          <span class="ret">DChatSdkOptionsBuilder</span> <span class="name">SetGroupMemberProvider</span>(<span class="type">IGroupMemberProvider</span> <span class="param">provider</span>)
+        </div>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Injects your application's group-membership resolver. <strong>Required for group messaging.</strong> The SDK calls this when distributing sender keys after a rotation. See <a href="groups.html" style="color:var(--accent)">Groups</a>.</p>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <div class="method-sig">
+          <span class="ret">DChatSdkOptionsBuilder</span> <span class="name">AddNode</span>(<span class="type">NodeConfiguration</span> <span class="param">node</span>)
+        </div>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Registers a DChat network node. The builder uses the first added node to auto-populate <code>blockchainRpcUrl</code>, <code>grpcServerUrl</code>, and <code>middlewareApiUrl</code> if they are not set individually.</p>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <div class="method-sig">
+          <span class="ret">DChatSdkOptionsBuilder</span> <span class="name">SetDefaultDerivationPath</span>(<span class="type">string</span> <span class="param">derivationPath</span>)
+        </div>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">BIP44 derivation path used when deriving keys from a mnemonic. Default: <code>m/44'/118'/0'/0/0</code> (Cosmos coin type). Change only if targeting a different slip-0044 coin type.</p>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <div class="method-sig">
+          <span class="ret">DChatSdkOptionsBuilder</span> <span class="name">SetDefaultPrefix</span>(<span class="type">string</span> <span class="param">prefix</span>)
+        </div>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Bech32 human-readable part (HRP) used when encoding wallet addresses. Default: <code>"dc"</code>, producing addresses like <code>dc1q...</code>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- NodeConfiguration -->
+  <div class="section">
+    <h2>NodeConfiguration</h2>
+    <p>Groups the three endpoints that describe a single DChat network node.</p>
+    <table class="prop-table">
+      <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+      <tr><td class="pname">Name</td><td class="ptype">string</td><td>Display name (defaults to the hostname of <code>BlockchainRpcUrl</code>).</td></tr>
+      <tr><td class="pname">BlockchainRpcUrl</td><td class="ptype">string</td><td>Cosmos/CometBFT RPC endpoint for on-chain operations.</td></tr>
+      <tr><td class="pname">GrpcServerUrl</td><td class="ptype">string</td><td>gRPC messaging endpoint (HTTP/2).</td></tr>
+      <tr><td class="pname">MiddlewareApiUrl</td><td class="ptype">string</td><td>REST middleware for IPFS uploads, authenticated queries.</td></tr>
+    </table>
+    <pre><span class="kw">var</span> node = <span class="kw">new</span> <span class="cls">NodeConfiguration</span>(
+    blockchainRpcUrl: <span class="str">"https://rpc.dchat.network"</span>,
+    grpcServerUrl:    <span class="str">"https://grpc.dchat.network"</span>,
+    middlewareApiUrl: <span class="str">"https://api.dchat.network"</span>,
+    name:             <span class="str">"mainnet"</span>);</pre>
+  </div>
+
+  <!-- KeyRotationPolicy -->
+  <div class="section">
+    <h2>KeyRotationPolicy</h2>
+    <p>Controls the automatic rotation threshold for E2EE chat keys. Rotation is triggered when <em>either</em> threshold is exceeded.</p>
+    <table class="prop-table">
+      <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+      <tr><td class="pname">MaxMessageCount</td><td class="ptype">long</td><td>10 000</td><td>Rotate the key after this many encrypted messages.</td></tr>
+      <tr><td class="pname">MaxAgeDays</td><td class="ptype">int</td><td>30</td><td>Rotate the key after this many days regardless of message volume.</td></tr>
+    </table>
+    <div class="callout tip">
+      <span class="callout-icon"><i class="fa-solid fa-lightbulb"></i></span>
+      <div class="callout-body">Lower thresholds provide better forward secrecy at the cost of more key-rotation handshake messages. For high-volume bots or channels, consider a higher <code>MaxMessageCount</code>.</div>
+    </div>
+  </div>
+
+  <!-- DChatSdkOptions properties -->
+  <div class="section">
+    <h2>DChatSdkOptions  All Properties</h2>
+    <table class="prop-table">
+      <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+      <tr><td class="pname">MiddlewareApiUrl</td><td class="ptype">string</td><td>required</td><td>Base URL for the authenticated REST middleware.</td></tr>
+      <tr><td class="pname">GrpcServerUrl</td><td class="ptype">string?</td><td>null</td><td>gRPC server for the message stream.</td></tr>
+      <tr><td class="pname">BlockchainRpcUrl</td><td class="ptype">string?</td><td>null</td><td>CometBFT RPC endpoint for on-chain identity operations.</td></tr>
+      <tr><td class="pname">DefaultDerivationPath</td><td class="ptype">string</td><td>m/44'/118'/0'/0/0</td><td>BIP44 path for key derivation.</td></tr>
+      <tr><td class="pname">DefaultPrefix</td><td class="ptype">string</td><td>"dc"</td><td>Bech32 HRP for address encoding.</td></tr>
+      <tr><td class="pname">DefaultChainId</td><td class="ptype">string</td><td>"messaging"</td><td>Chain ID embedded in ADR-036 auth payloads.</td></tr>
+      <tr><td class="pname">GrpcMaxMessageSize</td><td class="ptype">int</td><td>4 194 304</td><td>Max gRPC message size in bytes (4 MB).</td></tr>
+      <tr><td class="pname">GrpcKeepAliveInterval</td><td class="ptype">TimeSpan</td><td>60 s</td><td>HTTP/2 PING cadence for NAT keepalive.</td></tr>
+      <tr><td class="pname">GrpcConnectionTimeout</td><td class="ptype">TimeSpan</td><td>30 s</td><td>Dial timeout for gRPC channel.</td></tr>
+      <tr><td class="pname">ChatKeyRotationPolicy</td><td class="ptype">KeyRotationPolicy</td><td>10k msgs / 30 d</td><td>E2EE key rotation thresholds.</td></tr>
+      <tr><td class="pname">GroupMemberProvider</td><td class="ptype">IGroupMemberProvider?</td><td>null</td><td>App-provided group-member resolver (required for groups).</td></tr>
+      <tr><td class="pname">Nodes</td><td class="ptype">IReadOnlyList&lt;NodeConfiguration&gt;</td><td>[]</td><td>Registered network nodes.</td></tr>
+    </table>
+  </div>
+
+  <div class="page-nav">
+    <a href="getting-started.html">
+      <span class="nav-dir"> Previous</span>
+      <span class="nav-title">Getting Started</span>
+    </a>
+    <a href="identity.html" class="next">
+      <span class="nav-dir">Next </span>
+      <span class="nav-title">Identity &amp; Keys</span>
+    </a>
+  </div>
+</main>
+</div>
+  <script src="_reveal.js"></script>
+<script src="_sidebar.js"></script>
+</body>
+</html>
+
+

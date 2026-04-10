@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Getting Started  DChat SDK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link rel="stylesheet" href="_shared.css"/>
+</head>
+<body>
+
+<div class="layout-wrapper">
+<aside class="sidebar">
+  <a href="index.html" class="sidebar-logo">
+    <div class="logo-icon"><img src="Dchat.svg" alt="DChat"></div>
+    <div><div class="logo-text">DChat SDK</div><div class="logo-sub">Developer Docs</div></div>
+  </a>
+  <nav>
+    <div class="sidebar-section"><div class="sidebar-section-title">Overview</div>
+      <a href="index.html"><i class="nav-icon fa-solid fa-house"></i> Introduction</a>
+      <a href="getting-started.html" class="active"><i class="nav-icon fa-solid fa-rocket"></i> Getting Started</a>
+      <a href="configuration.html"><i class="nav-icon fa-solid fa-gear"></i> Configuration</a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-section-title">Core APIs</div>
+      <a href="identity.html"><i class="nav-icon fa-solid fa-id-card"></i> Identity &amp; Keys</a>
+      <a href="encryption.html"><i class="nav-icon fa-solid fa-lock"></i> Encryption</a>
+      <a href="messaging.html"><i class="nav-icon fa-solid fa-message"></i> Messaging</a>
+      <a href="groups.html"><i class="nav-icon fa-solid fa-users"></i> Groups</a>
+      <a href="streaming.html"><i class="nav-icon fa-solid fa-tower-broadcast"></i> Streaming</a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-section-title">Reference</div>
+      <a href="message-types.html"><i class="nav-icon fa-solid fa-list"></i> Message Types</a>
+      <a href="api-reference.html" class="sidebar-toggle"><i class="nav-icon fa-solid fa-code"></i> API Reference</a>
+      <div class="sidebar-submenu">
+        <a href="api-connection.html"><i class="nav-icon fa-solid fa-plug"></i> Connection</a>
+        <a href="api-identity.html"><i class="nav-icon fa-solid fa-id-card"></i> Identity</a>
+        <a href="api-chat-keys.html"><i class="nav-icon fa-solid fa-key"></i> Chat Keys</a>
+        <a href="api-encryption.html"><i class="nav-icon fa-solid fa-lock"></i> Encryption</a>
+        <a href="api-group-keys.html"><i class="nav-icon fa-solid fa-users-gear"></i> Group Keys</a>
+        <a href="api-messaging.html"><i class="nav-icon fa-solid fa-paper-plane"></i> Messaging</a>
+        <a href="api-group-messaging.html"><i class="nav-icon fa-solid fa-users"></i> Group Messaging</a>
+        <a href="api-group-control.html"><i class="nav-icon fa-solid fa-user-gear"></i> Group Control</a>
+        <a href="api-contact.html"><i class="nav-icon fa-solid fa-address-book"></i> Contacts</a>
+        <a href="api-presence.html"><i class="nav-icon fa-solid fa-circle-dot"></i> Presence</a>
+        <a href="api-media.html"><i class="nav-icon fa-solid fa-photo-film"></i> Media</a>
+        <a href="api-network.html"><i class="nav-icon fa-solid fa-network-wired"></i> Network</a>
+        <a href="api-events.html"><i class="nav-icon fa-solid fa-bolt"></i> Events</a>
+      </div>
+    </div>
+  </nav>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="breadcrumb"><a href="index.html">DChat SDK</a> <span></span> Getting Started</div>
+  </div>
+
+  <div class="page-header">
+    <h1>Getting Started</h1>
+    <p class="lead">From zero to sending your first encrypted message in under 5 minutes.</p>
+  </div>
+
+  <!-- Step 1 -->
+  <div class="section">
+    <h2>Step 1  Add the SDK</h2>
+    <p>Add a project reference to <code>DChatSDK</code> from your solution:</p>
+    <pre><span class="cm">&lt;!-- .csproj --&gt;</span>
+&lt;<span class="cls">ProjectReference</span> <span class="prop-c">Include</span>=<span class="str">"../DChatSDK/DChatSDK/DChatSDK.csproj"</span> /&gt;</pre>
+    <p>For MAUI apps, use the <code>DChatSDK-MAUI</code> wrapper project which registers platform-specific services automatically.</p>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="section">
+    <h2>Step 2  Build the client</h2>
+    <p>Use <code>DChatSdkOptions.CreateBuilder()</code> to configure and instantiate the client.</p>
+    <pre><span class="kw">using</span> DChatSDK;
+<span class="kw">using</span> DChatSDK.Configuration;
+
+<span class="cm">// 1. Configure the SDK</span>
+<span class="cls">DChatSdkOptions</span> options = <span class="cls">DChatSdkOptions</span>.<span class="met">CreateBuilder</span>()
+    .<span class="met">AddNode</span>(<span class="kw">new</span> <span class="cls">NodeConfiguration</span>(
+        blockchainRpcUrl:  <span class="str">"https://rpc.dchat.network"</span>,
+        grpcServerUrl:     <span class="str">"https://grpc.dchat.network"</span>,
+        middlewareApiUrl:  <span class="str">"https://api.dchat.network"</span>,
+        name:              <span class="str">"mainnet"</span>))
+    .<span class="met">SetGroupMemberProvider</span>(myGroupMemberProvider)
+    .<span class="met">Build</span>();
+
+<span class="cm">// 2. Instantiate the client</span>
+<span class="cls">IDChatSDKClient</span> sdk = <span class="kw">new</span> <span class="cls">DChatSDKClient</span>(options);</pre>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="section">
+    <h2>Step 3  Create or restore an identity</h2>
+    <pre><span class="cm">// Generate a fresh seed phrase (store this securely  it's the master secret)</span>
+<span class="kw">string</span> seed = <span class="kw">await</span> sdk.<span class="met">GenerateSeedPhraseAsync</span>(wordCount: <span class="num">24</span>);
+
+<span class="cm">// Derive the key pair from the seed phrase</span>
+<span class="cls">DChatChainKeyPair</span> keyPair = <span class="kw">await</span> sdk.<span class="met">RestoreFromSeedPhraseAsync</span>(seed);
+
+<span class="cm">// Store it securely on-device</span>
+<span class="kw">await</span> sdk.<span class="met">StoreKeyPairAsync</span>(keyPair);
+
+<span class="cm">// Register username on the blockchain</span>
+<span class="cls">BlockchainIdentityResult</span> result = <span class="kw">await</span> sdk.<span class="met">CreateIdentityAsync</span>(<span class="str">"alice"</span>);
+Console.<span class="met">WriteLine</span>(result.Identity.WalletAddress); <span class="cm">// dc1qxyz...</span></pre>
+
+    <div class="callout warn">
+      <span class="callout-icon"><i class="fa-solid fa-triangle-exclamation"></i></span>
+      <div class="callout-body"><strong>Never log or transmit seed phrases.</strong> Treat them like a private key  anyone with the phrase controls the identity.</div>
+    </div>
+
+    <p>To restore an existing identity on a new device:</p>
+    <pre><span class="cls">DChatChainKeyPair</span> keyPair = <span class="kw">await</span> sdk.<span class="met">RestoreFromSeedPhraseAsync</span>(existingSeedPhrase);
+<span class="kw">await</span> sdk.<span class="met">StoreKeyPairAsync</span>(keyPair);</pre>
+  </div>
+
+  <!-- Step 4 -->
+  <div class="section">
+    <h2>Step 4  Connect and stream</h2>
+    <pre><span class="cm">// Activate the identity and open the gRPC stream</span>
+<span class="kw">bool</span> ok = <span class="kw">await</span> sdk.<span class="met">ConnectAsync</span>();
+
+<span class="cm">// Subscribe to incoming messages</span>
+sdk.MessageReceived += (_, msg) =>
+{
+    Console.<span class="met">WriteLine</span>($<span class="str">"New message from {msg.SenderId}: {msg.Content}"</span>);
+};</pre>
+  </div>
+
+  <!-- Step 5 -->
+  <div class="section">
+    <h2>Step 5  Send a message</h2>
+    <pre><span class="cm">// Look up the recipient's public key first (fetched during contact exchange)</span>
+<span class="kw">string</span> recipientPublicKey = <span class="str">"03a1b2..."</span>;  <span class="cm">// hex-encoded Secp256k1</span>
+
+<span class="kw">await</span> sdk.<span class="met">SendTextMessageAsync</span>(
+    recipientWalletAddress: <span class="str">"dc1qbob..."</span>,
+    content:                <span class="str">"Hello, world!"</span>,
+    senderDid:              <span class="str">"did:dchat:alice"</span>,
+    recipientDid:           <span class="str">"did:dchat:bob"</span>,
+    chatId:                 myChatId,
+    recipientPublicKey:     recipientPublicKey);</pre>
+
+    <div class="callout tip">
+      <span class="callout-icon"><i class="fa-solid fa-lightbulb"></i></span>
+      <div class="callout-body"><strong>Public key exchange</strong> happens automatically during the contact request handshake via <code>ContactRequestMessageData</code> and <code>ContactResponseMessageData</code>. You don't need to implement this yourself  the SDK handles it.</div>
+    </div>
+  </div>
+
+  <!-- Step 6 -->
+  <div class="section">
+    <h2>Step 6  Disconnect cleanly</h2>
+    <pre><span class="kw">await</span> sdk.<span class="met">DisconnectAsync</span>();
+sdk.<span class="met">Dispose</span>();</pre>
+  </div>
+
+  <div class="section">
+    <h2>Full bootstrap example</h2>
+    <pre><span class="kw">await using</span> <span class="cls">IDChatSDKClient</span> sdk = <span class="kw">new</span> <span class="cls">DChatSDKClient</span>(
+    <span class="cls">DChatSdkOptions</span>.<span class="met">CreateBuilder</span>()
+        .<span class="met">AddNode</span>(<span class="kw">new</span> <span class="cls">NodeConfiguration</span>(
+            <span class="str">"https://rpc.dchat.network"</span>,
+            <span class="str">"https://grpc.dchat.network"</span>,
+            <span class="str">"https://api.dchat.network"</span>))
+        .<span class="met">SetGroupMemberProvider</span>(memberProvider)
+        .<span class="met">Build</span>());
+
+<span class="cls">DChatChainKeyPair</span> kp = <span class="kw">await</span> sdk.<span class="met">RestoreFromSeedPhraseAsync</span>(storedSeed);
+<span class="kw">await</span> sdk.<span class="met">StoreKeyPairAsync</span>(kp);
+<span class="kw">await</span> sdk.<span class="met">ConnectAsync</span>();
+
+sdk.MessageReceived += HandleMessage;
+
+<span class="kw">await</span> sdk.<span class="met">SendTextMessageAsync</span>(
+    <span class="str">"dc1qbob..."</span>, <span class="str">"Hey!"</span>,
+    <span class="str">"did:dchat:alice"</span>, <span class="str">"did:dchat:bob"</span>,
+    chatId, bobPublicKey);</pre>
+  </div>
+
+  <div class="section">
+    <h2>Using Dependency Injection</h2>
+    <p>For production apps, register the SDK client in your DI container. This enables better testability, lifetime management, and decoupling from concrete implementations.</p>
+    
+    <pre><span class="cm">// Program.cs or MauiProgram.cs</span>
+<span class="kw">using</span> Microsoft.Extensions.DependencyInjection;
+
+<span class="cls">IServiceCollection</span> services = <span class="kw">new</span> <span class="cls">ServiceCollection</span>();
+
+<span class="cm">// Register SDK options as singleton</span>
+services.<span class="met">AddSingleton</span>(sp => <span class="cls">DChatSdkOptions</span>.<span class="met">CreateBuilder</span>()
+    .<span class="met">AddNode</span>(<span class="kw">new</span> <span class="cls">NodeConfiguration</span>(
+        <span class="str">"https://rpc.dchat.network"</span>,
+        <span class="str">"https://grpc.dchat.network"</span>,
+        <span class="str">"https://api.dchat.network"</span>))
+    .<span class="met">Build</span>());
+
+<span class="cm">// Register SDK client as singleton (recommended)</span>
+services.<span class="met">AddSingleton</span>&lt;<span class="cls">IDChatSDKClient</span>, <span class="cls">DChatSDKClient</span>&gt;();
+
+<span class="cm">// For MAUI apps, use the factory:</span>
+<span class="cm">// services.AddSingleton&lt;IDChatSDKClient&gt;(sp => </span>
+<span class="cm">//     DChatMauiClientFactory.Create(sp.GetRequiredService&lt;DChatSdkOptions&gt;()));</span></pre>
+
+    <p>Then inject the client in your services, ViewModels, or pages:</p>
+    
+    <pre><span class="kw">public class</span> <span class="cls">ChatViewModel</span>
+{
+    <span class="kw">private readonly</span> <span class="cls">IDChatSDKClient</span> _sdk;
+    
+    <span class="kw">public</span> <span class="met">ChatViewModel</span>(<span class="cls">IDChatSDKClient</span> sdk)
+    {
+        _sdk = sdk;
+        _sdk.MessageReceived += OnMessageReceived;
+    }
+    
+    <span class="kw">public async</span> <span class="cls">Task</span> <span class="met">SendMessageAsync</span>(<span class="kw">string</span> to, <span class="kw">string</span> content)
+    {
+        <span class="kw">await</span> _sdk.<span class="met">SendTextMessageAsync</span>(to, content, ...);
+    }
+}</pre>
+
+    <div class="callout tip">
+      <span class="callout-icon"><i class="fa-solid fa-lightbulb"></i></span>
+      <div class="callout-body"><strong>Why DI?</strong> Injecting <code>IDChatSDKClient</code> makes unit testing trivial  just swap the real client for a mock implementation. It also lets the container manage the singleton lifetime, ensuring one shared instance across your app.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Handling Incoming Messages</h2>
+    <p>Messages arrive decrypted and ready to use. Subscribe to <code>MessageReceived</code> and route by <code>Payload.Type</code>:</p>
+    
+    <pre><span class="cm">// Subscribe once during initialization</span>
+sdk.MessageReceived += OnMessageReceived;
+
+<span class="cm">// Handler receives fully decrypted messages</span>
+<span class="kw">void</span> <span class="met">OnMessageReceived</span>(<span class="kw">object</span>? sender, <span class="cls">DecryptedMessage</span> msg)
+{
+    <span class="cm">// All messages have these core properties:</span>
+    <span class="cm">// - msg.SenderId      (wallet address of sender)</span>
+    <span class="cm">// - msg.ChatId        (conversation identifier)</span>
+    <span class="cm">// - msg.Timestamp     (when sent)</span>
+    <span class="cm">// - msg.Payload.Type  (MessageContentType enum)</span>
+    <span class="cm">// - msg.Payload.Data  (typed payload object)</span>
+
+    <span class="kw">switch</span> (msg.Payload.Type)
+    {
+        <span class="kw">case</span> <span class="cls">MessageContentType</span>.Text:
+        {
+            <span class="kw">var</span> text = (<span class="cls">TextMessageData</span>)msg.Payload.Data;
+            <span class="met">ShowTextMessage</span>(msg.SenderId, text.Text);
+            <span class="kw">break</span>;
+        }
+
+        <span class="kw">case</span> <span class="cls">MessageContentType</span>.Image:
+        {
+            <span class="kw">var</span> image = (<span class="cls">ImageMessageData</span>)msg.Payload.Data;
+            <span class="met">ShowImage</span>(msg.SenderId, image.Url, image.Caption);
+            <span class="kw">break</span>;
+        }
+
+        <span class="kw">case</span> <span class="cls">MessageContentType</span>.Video:
+        {
+            <span class="kw">var</span> video = (<span class="cls">VideoMessageData</span>)msg.Payload.Data;
+            <span class="met">ShowVideo</span>(msg.SenderId, video.Url, video.ThumbnailUrl);
+            <span class="kw">break</span>;
+        }
+
+        <span class="kw">case</span> <span class="cls">MessageContentType</span>.File:
+        {
+            <span class="kw">var</span> file = (<span class="cls">FileMessageData</span>)msg.Payload.Data;
+            <span class="met">ShowFileAttachment</span>(msg.SenderId, file.FileName, file.Size, file.Url);
+            <span class="kw">break</span>;
+        }
+
+        <span class="kw">case</span> <span class="cls">MessageContentType</span>.Location:
+        {
+            <span class="kw">var</span> loc = (<span class="cls">LocationMessageData</span>)msg.Payload.Data;
+            <span class="met">ShowLocation</span>(msg.SenderId, loc.Latitude, loc.Longitude, loc.Label);
+            <span class="kw">break</span>;
+        }
+
+        <span class="kw">case</span> <span class="cls">MessageContentType</span>.CallOffer:
+        {
+            <span class="kw">var</span> offer = (<span class="cls">CallOfferMessageData</span>)msg.Payload.Data;
+            <span class="met">ShowIncomingCall</span>(msg.SenderId, offer.CallId, offer.IsVideo);
+            <span class="kw">break</span>;
+        }
+
+        <span class="kw">case</span> <span class="cls">MessageContentType</span>.ContactRequest:
+        {
+            <span class="kw">var</span> req = (<span class="cls">ContactRequestMessageData</span>)msg.Payload.Data;
+            <span class="met">ShowContactRequest</span>(msg.SenderId, req.DisplayName, req.PublicKey);
+            <span class="kw">break</span>;
+        }
+
+        <span class="kw">default</span>:
+            <span class="cm">// Handle unknown or future message types</span>
+            <span class="met">LogUnknownMessage</span>(msg);
+            <span class="kw">break</span>;
+    }
+}</pre>
+
+    <div class="callout info">
+      <span class="callout-icon"><i class="fa-solid fa-circle-info"></i></span>
+      <div class="callout-body"><strong>Thread safety:</strong> Events fire on the thread pool. For UI updates, marshal to your UI thread (e.g., <code>MainThread.BeginInvokeOnMainThread</code> in MAUI, or <code>Dispatcher.Dispatch</code> in WPF).</div>
+    </div>
+
+    <h3>Other useful events</h3>
+    <pre><span class="cm">// Track connection state</span>
+sdk.ConnectionChanged += (_, connected) =>
+{
+    <span class="kw">if</span> (connected) <span class="met">HideOfflineBanner</span>();
+    <span class="kw">else</span>       <span class="met">ShowOfflineBanner</span>();
+};
+
+<span class="cm">// Handle delivery confirmations</span>
+sdk.MessageAcknowledged += (_, msg) =>
+{
+    <span class="met">MarkMessageDelivered</span>(msg.MessageId);
+};
+
+<span class="cm">// Retry failed messages</span>
+sdk.MessageFailed += (_, msg) =>
+{
+    <span class="met">ScheduleRetry</span>(msg, delay: TimeSpan.<span class="met">FromSeconds</span>(30));
+};</pre>
+  </div>
+
+  <div class="page-nav">
+    <a href="index.html">
+      <span class="nav-dir"> Previous</span>
+      <span class="nav-title">Introduction</span>
+    </a>
+    <a href="configuration.html" class="next">
+      <span class="nav-dir">Next </span>
+      <span class="nav-title">Configuration</span>
+    </a>
+  </div>
+</main>
+</div>
+  <script src="_reveal.js"></script>
+<script src="_sidebar.js"></script>
+</body>
+</html>
+
+

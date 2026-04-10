@@ -1,0 +1,308 @@
+<div class="topbar">
+  <div class="breadcrumb"><a href="#/intro" data-page="intro">DChat SDK</a> <span>></span> Messaging</div>
+</div>
+
+<div class="page-header">
+  <h1>Messaging</h1>
+  <p class="lead">Send text, images, video, audio, files, albums, and typed protocol payloads. Every message is encrypted before leaving the device and routed via the gRPC stream.</p>
+</div>
+
+<!-- MessagePayload -->
+<div class="section">
+  <h2>MessagePayload</h2>
+  <p><code>MessagePayload</code> is the universal message container. It wraps typed <code>MessageDataBase</code> and is serialised to JSON, encrypted, and transmitted as an opaque envelope.</p>
+  <table class="prop-table">
+    <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+    <tr><td class="pname">MessageId</td><td class="ptype">string</td><td>UUID uniquely identifying this message.</td></tr>
+    <tr><td class="pname">ChatId</td><td class="ptype">string</td><td>Deterministic hash of participant DIDs (1-to-1) or group ID. Never visible to the server.</td></tr>
+    <tr><td class="pname">Type</td><td class="ptype">MessageContentType</td><td>Discriminator used to deserialise <code>Data</code> to the correct concrete type.</td></tr>
+    <tr><td class="pname">Data</td><td class="ptype">MessageDataBase</td><td>The typed message body (e.g., <code>TextMessageData</code>, <code>ImageMessageData</code>).</td></tr>
+    <tr><td class="pname">ReplyTo</td><td class="ptype">string?</td><td>Message ID of the message being replied to.</td></tr>
+    <tr><td class="pname">IsForwarded</td><td class="ptype">bool</td><td>True when this message was forwarded from another conversation.</td></tr>
+    <tr><td class="pname">OriginalMessageId</td><td class="ptype">string?</td><td>Source message ID if forwarded.</td></tr>
+    <tr><td class="pname">ForwardedFromDid</td><td class="ptype">string?</td><td>DID of the original sender.</td></tr>
+    <tr><td class="pname">ExpiresAt</td><td class="ptype">long?</td><td>Unix timestamp after which the message should be deleted by the recipient.</td></tr>
+  </table>
+</div>
+
+<!-- Delivery flow -->
+<div class="section">
+  <h2>Delivery Flow</h2>
+  <div class="infographic">
+    <div class="infographic-title">Message Delivery Pipeline</div>
+    
+    <div class="flow-diagram">
+      <div class="flow-step">
+        <div class="flow-node">
+          <div class="flow-node-icon"><i class="fa-solid fa-paper-plane"></i></div>
+          <div class="flow-node-content">
+            <div class="flow-node-title">SendTextMessageAsync()</div>
+            <div class="flow-node-desc">App initiates message send</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flow-connector"><div class="flow-arrow"></div></div>
+      
+      <div class="flow-step">
+        <div class="flow-node">
+          <div class="flow-node-icon"><i class="fa-solid fa-cube"></i></div>
+          <div class="flow-node-content">
+            <div class="flow-node-title">MessagePayloadFactory</div>
+            <div class="flow-node-desc">Builds MessagePayload structure</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flow-connector"><div class="flow-arrow"></div></div>
+      
+      <div class="flow-step">
+        <div class="flow-node">
+          <div class="flow-node-icon"><i class="fa-solid fa-lock"></i></div>
+          <div class="flow-node-content">
+            <div class="flow-node-title">CryptoService</div>
+            <div class="flow-node-desc">ECIES / AES-GCM encryption</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flow-connector"><div class="flow-arrow"></div></div>
+      
+      <div class="flow-step">
+        <div class="flow-node">
+          <div class="flow-node-icon"><i class="fa-solid fa-layer-group"></i></div>
+          <div class="flow-node-content">
+            <div class="flow-node-title">GrpcStreamingService</div>
+            <div class="flow-node-desc">Enqueues QueuedMessage</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flow-connector"><div class="flow-arrow"></div></div>
+      
+      <div class="flow-step">
+        <div class="flow-node">
+          <div class="flow-node-icon"><i class="fa-solid fa-tower-broadcast"></i></div>
+          <div class="flow-node-content">
+            <div class="flow-node-title">gRPC Stream</div>
+            <div class="flow-node-desc">Writes to server, routes to recipient</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flow-connector"><div class="flow-arrow"></div></div>
+      
+      <div class="flow-step">
+        <div class="flow-node">
+          <div class="flow-node-icon"><i class="fa-solid fa-check-circle"></i></div>
+          <div class="flow-node-content">
+            <div class="flow-node-title">Server ACK</div>
+            <div class="flow-node-desc">OnMessageAcknowledged event</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flow-connector"><div class="flow-arrow"></div></div>
+      
+      <div class="flow-step">
+        <div class="flow-node" style="border-color: rgba(62, 207, 142, 0.4); background: rgba(62, 207, 142, 0.08);">
+          <div class="flow-node-icon" style="background: rgba(62, 207, 142, 0.15);"><i class="fa-solid fa-envelope-open" style="color: #3ecf8e;"></i></div>
+          <div class="flow-node-content">
+            <div class="flow-node-title" style="color: #3ecf8e;">OnMessageReceived</div>
+            <div class="flow-node-desc">Recipient decrypts and receives</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <p style="margin-top:.8rem">If the stream is offline, messages stay in the in-memory queue and are flushed automatically on reconnect via <code>ProcessQueuedMessagesAsync()</code>.</p>
+</div>
+
+<!-- Typed send methods -->
+<div class="section">
+  <h2>Typed Send Methods</h2>
+  <p>These are convenience wrappers that build the correct <code>MessagePayload</code>, handle IPFS upload for media, and call <code>SendMessageToWalletAsync</code> internally.</p>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task&lt;bool&gt;</span> <span class="name">SendTextMessageAsync</span>(...)
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Sends a plain-text message with optional reply support.</p>
+      <table class="param-table">
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>recipientWalletAddress</td><td>string</td><td>Bech32 address used for gRPC routing.</td></tr>
+        <tr><td>content</td><td>string</td><td>UTF-8 message text.</td></tr>
+        <tr><td>senderDid</td><td>string</td><td>DID of the sender.</td></tr>
+        <tr><td>recipientDid</td><td>string</td><td>DID of the recipient.</td></tr>
+        <tr><td>chatId</td><td>string</td><td>Conversation identifier.</td></tr>
+        <tr><td>recipientPublicKey</td><td>string</td><td>Recipient's chat public key (hex).</td></tr>
+        <tr><td>messageId</td><td>string?</td><td>Optional explicit message ID. Auto-generated if null.</td></tr>
+        <tr><td>replyToMessageId</td><td>string?</td><td>Message ID this is replying to.</td></tr>
+      </table>
+      <pre><span class="kw">await</span> sdk.<span class="met">SendTextMessageAsync</span>(
+    recipientWalletAddress: <span class="str">"dc1qbob..."</span>,
+    content:                <span class="str">"Hello!"</span>,
+    senderDid:              <span class="str">"did:dchat:alice"</span>,
+    recipientDid:           <span class="str">"did:dchat:bob"</span>,
+    chatId:                 chatId,
+    recipientPublicKey:     bobChatPublicKey);</pre>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task&lt;bool&gt;</span> <span class="name">SendImageMessageAsync</span>(...)
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Uploads the image and optional thumbnail to IPFS, then sends an <code>ImageMessageData</code> containing the IPFS CIDs and dimensions. Upload progress is reported via the optional <code>IProgress&lt;double&gt;</code>.</p>
+      <table class="param-table">
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>imageData</td><td>byte[]</td><td>Raw image bytes (JPEG, PNG, WEBP, etc.).</td></tr>
+        <tr><td>thumbnailData</td><td>byte[]?</td><td>Optional pre-generated thumbnail. SDK generates one if null.</td></tr>
+        <tr><td>width / height</td><td>int</td><td>Image dimensions in pixels.</td></tr>
+        <tr><td>caption</td><td>string?</td><td>Optional image caption.</td></tr>
+        <tr><td>uploadProgress</td><td>IProgress&lt;double&gt;?</td><td>Reports upload progress (0.01.0).</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task&lt;bool&gt;</span> <span class="name">SendVideoMessageAsync</span>(...)
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Uploads the video to IPFS and sends a <code>VideoMessageData</code> with the CID, thumbnail, duration, and dimensions.</p>
+      <table class="param-table">
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>videoData</td><td>byte[]</td><td>Encoded video bytes (MP4 recommended).</td></tr>
+        <tr><td>thumbnailData</td><td>byte[]?</td><td>Optional video thumbnail.</td></tr>
+        <tr><td>durationSeconds</td><td>int</td><td>Duration of the video.</td></tr>
+        <tr><td>filename</td><td>string</td><td>Original file name (e.g., <code>"clip.mp4"</code>).</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task&lt;bool&gt;</span> <span class="name">SendAudioMessageAsync</span>(...)
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Uploads an audio clip and sends an <code>AudioMessageData</code> with the CID, waveform, and duration.</p>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task&lt;bool&gt;</span> <span class="name">SendFileMessageAsync</span>(...)
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Uploads any file to IPFS and sends a <code>FileMessageData</code> containing the CID, filename, MIME type, and file size.</p>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task&lt;bool&gt;</span> <span class="name">SendAlbumMessageAsync</span>(...)
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Uploads multiple images in parallel and sends them as a single <code>AlbumMessageData</code>. Each image is represented by an <code>AlbumImageInput</code>.</p>
+      <pre><span class="kw">var</span> images = <span class="kw">new</span>[]
+{
+    <span class="kw">new</span> <span class="cls">AlbumImageInput</span> { ImageData = img1, Width = <span class="num">1080</span>, Height = <span class="num">720</span> },
+    <span class="kw">new</span> <span class="cls">AlbumImageInput</span> { ImageData = img2, Width = <span class="num">800</span>,  Height = <span class="num">600</span> }
+};
+<span class="kw">await</span> sdk.<span class="met">SendAlbumMessageAsync</span>(recipientWallet, images, senderDid,
+    recipientDid, chatId, recipientPublicKey);</pre>
+    </div>
+  </div>
+</div>
+
+<!-- Low-level send -->
+<div class="section">
+  <h2>Low-Level Send</h2>
+  <p>Use <code>SendMessageToWalletAsync</code> when you have already built a <code>MessagePayload</code> with custom data.</p>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task&lt;bool&gt;</span> <span class="name">SendMessageToWalletAsync</span>(<span class="type">string</span> <span class="param">recipientWalletAddress</span>, <span class="type">MessagePayload</span> <span class="param">payload</span>, <span class="type">string</span> <span class="param">recipientPublicKey</span>)
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Encrypts <code>payload</code> with the recipient's chat key and enqueues it for gRPC delivery. Returns <code>true</code> if successfully enqueued (not yet delivered  listen for <code>OnMessageAcknowledged</code> for delivery confirmation).</p>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task&lt;bool&gt;</span> <span class="name">SendEncryptedEnvelopeToWalletAsync</span>(<span class="type">string</span> <span class="param">recipientWalletAddress</span>, <span class="type">string</span> <span class="param">encryptedEnvelopeJson</span>)
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Sends a pre-encrypted envelope directly. Use when you've handled encryption yourself (e.g., when forwarding a group sender-key distribution). The SDK does not re-encrypt the payload.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Profile messages -->
+<div class="section">
+  <h2>Profile &amp; Contact Messages</h2>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task&lt;bool&gt;</span> <span class="name">SendProfileRequest</span>(...)
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Sends a <code>ProfileRequestMessageData</code> asking the recipient to share their current profile (avatar, display name, chat public key). Used during contact resolution when the local cache is stale.</p>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task&lt;bool&gt;</span> <span class="name">SendProfileUpdateAsync</span>(...)
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Sends a <code>ProfileUpdateMessageData</code> to a contact with the local user's current profile info. Sent proactively when a profile field changes, or in response to a <code>ProfileRequest</code>.</p>
+      <table class="param-table">
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>username</td><td>string</td><td>Current username.</td></tr>
+        <tr><td>displayName</td><td>string?</td><td>Optional display name override.</td></tr>
+        <tr><td>statusMessage</td><td>string?</td><td>Optional status text.</td></tr>
+        <tr><td>avatarIpfsCid</td><td>string?</td><td>IPFS CID of the avatar image.</td></tr>
+        <tr><td>senderChatPublicKey</td><td>string?</td><td>Current chat public key so the recipient can encrypt future messages correctly.</td></tr>
+        <tr><td>updatedFields</td><td>string[]?</td><td>Array of field names that changed, enabling partial updates.</td></tr>
+        <tr><td>requestId</td><td>string?</td><td>ID from the originating <code>ProfileRequest</code>, if responding.</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="page-nav">
+  <a href="#/encryption" data-page="encryption">
+    <span class="nav-dir"> Previous</span>
+    <span class="nav-title">Encryption</span>
+  </a>
+  <a href="#/groups" data-page="groups" class="next">
+    <span class="nav-dir">Next </span>
+    <span class="nav-title">Groups</span>
+  </a>
+</div>

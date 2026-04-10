@@ -1,0 +1,265 @@
+<div class="topbar">
+  <div class="breadcrumb"><a href="#/intro" data-page="intro">DChat SDK</a> <span>></span> Streaming</div>
+</div>
+
+<div class="page-header">
+  <h1>Streaming</h1>
+  <p class="lead">The <code>IGrpcStreamingService</code> manages the bidirectional gRPC stream, ACK queue, reconnect logic, and failed-message tracking. You interact with it indirectly through <code>IDChatSDKClient</code>  but understanding it helps you build resilient apps.</p>
+</div>
+
+<!-- Connection lifecycle -->
+<div class="section">
+  <h2>Connection Lifecycle</h2>
+  <div class="infographic">
+    <div class="infographic-title">Connection State Machine</div>
+    
+    <div class="flow-diagram">
+      <div class="flow-step">
+        <div class="flow-node">
+          <div class="flow-node-icon"><i class="fa-solid fa-plug"></i></div>
+          <div class="flow-node-content">
+            <div class="flow-node-title">ConnectAsync()</div>
+            <div class="flow-node-desc">Initiate connection</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flow-connector"><div class="flow-arrow"></div></div>
+      
+      <div class="flow-step">
+        <div class="flow-node highlight">
+          <div class="flow-node-icon"><i class="fa-solid fa-tower-broadcast"></i></div>
+          <div class="flow-node-content">
+            <div class="flow-node-title">StartStreamingAsync()</div>
+            <div class="flow-node-desc">Opens HTTP/2 channel, auth handshake</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flow-connector"><div class="flow-arrow"></div></div>
+      
+      <div class="flow-step">
+        <div class="flow-node" style="border-color: rgba(62, 207, 142, 0.4); background: rgba(62, 207, 142, 0.08);">
+          <div class="flow-node-icon" style="background: rgba(62, 207, 142, 0.15);"><i class="fa-solid fa-check" style="color: #3ecf8e;"></i></div>
+          <div class="flow-node-content">
+            <div class="flow-node-title" style="color: #3ecf8e;">OnConnected</div>
+            <div class="flow-node-desc">Connection established</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flow-connector"><div class="flow-arrow"></div></div>
+      
+      <div class="flow-step">
+        <div class="flow-node">
+          <div class="flow-node-icon"><i class="fa-solid fa-arrows-rotate"></i></div>
+          <div class="flow-node-content">
+            <div class="flow-node-title">ProcessQueuedMessagesAsync()</div>
+            <div class="flow-node-desc">Drains offline queue</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flow-connector"><div class="flow-arrow"></div></div>
+      
+      <div class="flow-step">
+        <div class="flow-node" style="border-color: rgba(240, 160, 75, 0.4); background: rgba(240, 160, 75, 0.08);">
+          <div class="flow-node-icon" style="background: rgba(240, 160, 75, 0.15);"><i class="fa-solid fa-triangle-exclamation" style="color: #22d3ee;"></i></div>
+          <div class="flow-node-content">
+            <div class="flow-node-title" style="color: #22d3ee;">OnReconnecting</div>
+            <div class="flow-node-desc">Exponential backoff retry</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flow-connector"><div class="flow-arrow"></div></div>
+      
+      <div class="flow-step">
+        <div class="flow-node" style="border-color: rgba(224, 92, 110, 0.4); background: rgba(224, 92, 110, 0.08);">
+          <div class="flow-node-icon" style="background: rgba(224, 92, 110, 0.15);"><i class="fa-solid fa-xmark" style="color: #e05c6e;"></i></div>
+          <div class="flow-node-content">
+            <div class="flow-node-title" style="color: #e05c6e;">OnDisconnected</div>
+            <div class="flow-node-desc">Max retries exceeded</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Properties -->
+<div class="section">
+  <h2>State Properties</h2>
+  <table class="prop-table">
+    <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+    <tr><td class="pname">IsConnected</td><td class="ptype">bool</td><td>True when the underlying gRPC channel is connected to the server.</td></tr>
+    <tr><td class="pname">IsStreaming</td><td class="ptype">bool</td><td>True when the bidirectional stream is active and writing/reading.</td></tr>
+    <tr><td class="pname">ConnectionState</td><td class="ptype">ReliableConnectionState</td><td>Fine-grained state: <code>Disconnected</code>, <code>Connecting</code>, <code>Connected</code>, <code>Reconnecting</code>.</td></tr>
+  </table>
+</div>
+
+<!-- Methods -->
+<div class="section">
+  <h2>Methods</h2>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task&lt;bool&gt;</span> <span class="name">StartStreamingAsync</span>(<span class="type">string</span> <span class="param">senderAddress</span>, <span class="type">object</span> <span class="param">keyPair</span>, <span class="type">CancellationToken</span> <span class="param">cancellationToken</span>)
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Opens the gRPC channel, authenticates via ADR-036 signature handshake, and starts the read/write loops. Called automatically by <code>ConnectAsync()</code>.</p>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task</span> <span class="name">StopStreamingAsync</span>()
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Gracefully completes the outbound write stream, waits for in-flight ACKs to settle, then closes the channel. Called automatically by <code>DisconnectAsync()</code>.</p>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task</span> <span class="name">ProcessQueuedMessagesAsync</span>()
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Drains the outbound queue and sends all pending messages over the active stream. Triggered automatically on reconnect. You can call it manually after returning from background to flush any offline-queued messages immediately.</p>
+      <pre><span class="cm">// Called automatically, but you can trigger it manually:</span>
+sdk.MessageReceived += <span class="kw">async</span> (_, _) => { };
+<span class="kw">await</span> grpcService.<span class="met">ProcessQueuedMessagesAsync</span>();</pre>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task&lt;bool&gt;</span> <span class="name">SendImmediateAsync</span>(<span class="type">string</span> <span class="param">messageId</span>, <span class="type">string</span> <span class="param">senderId</span>, <span class="type">string</span> <span class="param">receiverId</span>, <span class="type">string</span> <span class="param">content</span>, <span class="type">MessageContentType</span> <span class="param">contentType</span>)
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Writes directly to the gRPC stream, bypassing the persistent ACK queue. No retry, no offline buffering. Used exclusively for <strong>latency-sensitive call signaling</strong> (WebRTC offer/answer/ICE candidates) where a delayed retry would make no sense.</p>
+      <div class="callout warn">
+        <span class="callout-icon"><i class="fa-solid fa-triangle-exclamation"></i></span>
+        <div class="callout-body"><strong>Fire-and-forget.</strong> If the stream is unavailable at call time, this returns <code>false</code> and the message is <em>not</em> queued. Do not use for chat messages.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Failed message cache -->
+<div class="section">
+  <h2>Failed Message Cache</h2>
+  <p>When a message exceeds its ACK timeout, the SDK stores its ID in an in-memory failed-message cache. On reconnect, <code>ProtocolMessageRetryService</code> reads this cache and re-sends the failed messages.</p>
+
+  <table class="prop-table">
+    <tr><th>Method</th><th>Description</th></tr>
+    <tr><td class="pname">StoreFailedMessageId(senderDid, messageId)</td><td>Records a message as failed.</td></tr>
+    <tr><td class="pname">GetFailedMessageIds(senderDid)</td><td>Returns all failed message IDs for a sender.</td></tr>
+    <tr><td class="pname">ClearFailedMessageIds(senderDid, ids)</td><td>Removes specific IDs after successful retry.</td></tr>
+    <tr><td class="pname">ClearAllFailedMessagesForSender(senderDid)</td><td>Clears the entire cache for a sender (e.g., on sign-out).</td></tr>
+    <tr><td class="pname">CancelMessageTimeout(messageId)</td><td>Cancels the ACK-wait timer for an out-of-band ack.</td></tr>
+  </table>
+</div>
+
+<!-- Events -->
+<div class="section">
+  <h2>Events</h2>
+  <p>All events are raised on the thread pool. Marshal to the UI thread as required by your framework.</p>
+
+  <div class="event-block">
+    <div>
+      <span class="event-name">OnMessageReceived</span>
+      <span class="event-type">EventHandler&lt;ChatMessage&gt;</span>
+      <span class="event-desc">Fires when a new inbound message arrives from the stream after being decrypted.</span>
+    </div>
+  </div>
+  <div class="event-block">
+    <div>
+      <span class="event-name">OnMessageSent</span>
+      <span class="event-type">EventHandler&lt;QueuedMessage&gt;</span>
+      <span class="event-desc">Fires when a message has been written to the stream (before ACK).</span>
+    </div>
+  </div>
+  <div class="event-block">
+    <div>
+      <span class="event-name">OnMessageAcknowledged</span>
+      <span class="event-type">EventHandler&lt;QueuedMessage&gt;</span>
+      <span class="event-desc">Fires when the server confirms delivery of a sent message.</span>
+    </div>
+  </div>
+  <div class="event-block">
+    <div>
+      <span class="event-name">OnMessageFailed</span>
+      <span class="event-type">EventHandler&lt;QueuedMessage&gt;</span>
+      <span class="event-desc">Fires when a message times out waiting for an ACK. The message is moved to the failed cache for retry.</span>
+    </div>
+  </div>
+  <div class="event-block">
+    <div>
+      <span class="event-name">OnStreamError</span>
+      <span class="event-type">EventHandler&lt;Exception&gt;</span>
+      <span class="event-desc">Fires on an unrecoverable stream-level error before reconnect is attempted.</span>
+    </div>
+  </div>
+  <div class="event-block">
+    <div>
+      <span class="event-name">OnConnected</span>
+      <span class="event-type">EventHandler</span>
+      <span class="event-desc">Fires when the stream is successfully established or re-established after a disconnect.</span>
+    </div>
+  </div>
+  <div class="event-block">
+    <div>
+      <span class="event-name">OnDisconnected</span>
+      <span class="event-type">EventHandler</span>
+      <span class="event-desc">Fires when the stream closes (graceful or error).</span>
+    </div>
+  </div>
+  <div class="event-block">
+    <div>
+      <span class="event-name">OnReconnecting</span>
+      <span class="event-type">EventHandler&lt;int&gt;</span>
+      <span class="event-desc">Fires at each reconnect attempt. The argument is the 1-based attempt number. Use for UI indicators.</span>
+    </div>
+  </div>
+
+  <h3>Subscribing to events</h3>
+  <pre><span class="cm">// Wire up via IDChatSDKClient (recommended)</span>
+sdk.MessageReceived      += OnMessage;
+sdk.ConnectionChanged    += OnConnectionChanged;
+
+<span class="cm">// Or subscribe to the raw streaming service directly</span>
+grpcService.OnMessageReceived    += (_, msg)   => HandleInbound(msg);
+grpcService.OnMessageFailed      += (_, msg)   => ScheduleRetry(msg);
+grpcService.OnReconnecting       += (_, attempt) => ShowBanner(attempt);
+grpcService.OnConnected          += (_, _)     => HideBanner();</pre>
+</div>
+
+<!-- Offline behaviour -->
+<div class="section">
+  <h2>Offline Behaviour</h2>
+  <p>When the stream is unavailable, <code>GrpcStreamingService</code> stores outbound messages in an in-memory <code>IQueueService</code>. On reconnect, <code>ProcessQueuedMessagesAsync()</code> drains the queue automatically. The queue is not persisted to disk by default  if your app is killed while offline, consider persisting the queue yourself and re-enqueuing on next launch.</p>
+  <div class="callout tip">
+    <span class="callout-icon"><i class="fa-solid fa-info-circle"></i></span>
+    <div class="callout-body">Subscribe to <code>OnConnected</code> and call <code>sdk.ConnectAsync()</code> from your app's network-reachability callback to ensure messages are flushed promptly when connectivity returns.</div>
+  </div>
+</div>
+
+<div class="page-nav">
+  <a href="#/groups" data-page="groups">
+    <span class="nav-dir"> Previous</span>
+    <span class="nav-title">Groups</span>
+  </a>
+  <a href="#/message-types" data-page="message-types" class="next">
+    <span class="nav-dir">Next </span>
+    <span class="nav-title">Message Types</span>
+  </a>
+</div>

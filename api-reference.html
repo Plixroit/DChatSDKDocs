@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>API Reference - DChat SDK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link rel="stylesheet" href="_shared.css"/>
+</head>
+<body>
+
+<div class="layout-wrapper">
+<aside class="sidebar">
+  <a href="index.html" class="sidebar-logo">
+    <div class="logo-icon"><img src="Dchat.svg" alt="DChat"></div>
+    <div><div class="logo-text">DChat SDK</div><div class="logo-sub">Developer Docs</div></div>
+  </a>
+  <nav>
+    <div class="sidebar-section"><div class="sidebar-section-title">Overview</div>
+      <a href="index.html"><i class="nav-icon fa-solid fa-house"></i> Introduction</a>
+      <a href="getting-started.html"><i class="nav-icon fa-solid fa-rocket"></i> Getting Started</a>
+      <a href="configuration.html"><i class="nav-icon fa-solid fa-gear"></i> Configuration</a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-section-title">Core APIs</div>
+      <a href="identity.html"><i class="nav-icon fa-solid fa-id-card"></i> Identity &amp; Keys</a>
+      <a href="encryption.html"><i class="nav-icon fa-solid fa-lock"></i> Encryption</a>
+      <a href="messaging.html"><i class="nav-icon fa-solid fa-message"></i> Messaging</a>
+      <a href="groups.html"><i class="nav-icon fa-solid fa-users"></i> Groups</a>
+      <a href="streaming.html"><i class="nav-icon fa-solid fa-tower-broadcast"></i> Streaming</a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-section-title">Reference</div>
+      <a href="message-types.html"><i class="nav-icon fa-solid fa-list"></i> Message Types</a>
+      <a href="api-reference.html" class="active"><i class="nav-icon fa-solid fa-code"></i> API Reference</a>
+      <div class="sidebar-submenu">
+        <a href="api-connection.html"><i class="nav-icon fa-solid fa-plug"></i> Connection</a>
+        <a href="api-identity.html"><i class="nav-icon fa-solid fa-id-card"></i> Identity</a>
+        <a href="api-chat-keys.html"><i class="nav-icon fa-solid fa-key"></i> Chat Keys</a>
+        <a href="api-encryption.html"><i class="nav-icon fa-solid fa-lock"></i> Encryption</a>
+        <a href="api-group-keys.html"><i class="nav-icon fa-solid fa-users-gear"></i> Group Keys</a>
+        <a href="api-messaging.html"><i class="nav-icon fa-solid fa-paper-plane"></i> Messaging</a>
+        <a href="api-group-messaging.html"><i class="nav-icon fa-solid fa-users"></i> Group Messaging</a>
+        <a href="api-group-control.html"><i class="nav-icon fa-solid fa-user-gear"></i> Group Control</a>
+        <a href="api-contact.html"><i class="nav-icon fa-solid fa-address-book"></i> Contacts &amp; Profile</a>
+        <a href="api-presence.html"><i class="nav-icon fa-solid fa-circle-dot"></i> Presence</a>
+        <a href="api-media.html"><i class="nav-icon fa-solid fa-photo-film"></i> Media &amp; IPFS</a>
+        <a href="api-network.html"><i class="nav-icon fa-solid fa-network-wired"></i> Network</a>
+        <a href="api-events.html"><i class="nav-icon fa-solid fa-bolt"></i> Events</a>
+      </div>
+    </div>
+  </nav>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="breadcrumb"><a href="index.html">DChat SDK</a> <span></span> API Reference</div>
+  </div>
+
+  <div class="page-header">
+    <h1>API Reference</h1>
+    <p class="lead">Complete reference for <code>IDChatSDKClient</code> interface, organized by category.</p>
+  </div>
+
+  <div class="section">
+    <h2>Overview</h2>
+    <p>The <code>IDChatSDKClient</code> interface provides a unified API for all SDK functionality including identity management, messaging, encryption, and blockchain operations. Select a category below to view detailed method signatures, parameters, and usage examples.</p>
+  </div>
+
+  <div class="section">
+    <h2>API Categories</h2>
+    <div class="cards">
+      <a class="card" href="api-connection.html"><div class="card-icon"><i class="fa-solid fa-plug"></i></div><div class="card-title">Connection</div><div class="card-desc">Connect, disconnect, connection state properties.</div></a>
+      <a class="card" href="api-identity.html"><div class="card-icon"><i class="fa-solid fa-id-card"></i></div><div class="card-title">Identity</div><div class="card-desc">Create, restore, store, and manage blockchain identities.</div></a>
+      <a class="card" href="api-chat-keys.html"><div class="card-icon"><i class="fa-solid fa-key"></i></div><div class="card-title">Chat Keys</div><div class="card-desc">Generate, rotate, and distribute chat encryption keys.</div></a>
+      <a class="card" href="api-encryption.html"><div class="card-icon"><i class="fa-solid fa-lock"></i></div><div class="card-title">Encryption</div><div class="card-desc">ECIES and symmetric encryption operations.</div></a>
+      <a class="card" href="api-group-keys.html"><div class="card-icon"><i class="fa-solid fa-users-gear"></i></div><div class="card-title">Group Keys</div><div class="card-desc">Symmetric group keys and sender key management.</div></a>
+      <a class="card" href="api-messaging.html"><div class="card-icon"><i class="fa-solid fa-paper-plane"></i></div><div class="card-title">Messaging</div><div class="card-desc">Send text, images, videos, files, locations, albums.</div></a>
+      <a class="card" href="api-group-messaging.html"><div class="card-icon"><i class="fa-solid fa-users"></i></div><div class="card-title">Group Messaging</div><div class="card-desc">Send messages to groups with sender-key encryption.</div></a>
+      <a class="card" href="api-group-control.html"><div class="card-icon"><i class="fa-solid fa-user-gear"></i></div><div class="card-title">Group Control</div><div class="card-desc">Create groups, add/remove members, update settings.</div></a>
+      <a class="card" href="api-contact.html"><div class="card-icon"><i class="fa-solid fa-address-book"></i></div><div class="card-title">Contacts &amp; Profile</div><div class="card-desc">Contact requests, profile requests and updates.</div></a>
+      <a class="card" href="api-presence.html"><div class="card-icon"><i class="fa-solid fa-circle-dot"></i></div><div class="card-title">Presence</div><div class="card-desc">Online status requests and responses.</div></a>
+      <a class="card" href="api-media.html"><div class="card-icon"><i class="fa-solid fa-photo-film"></i></div><div class="card-title">Media &amp; IPFS</div><div class="card-desc">Upload, download, encrypt, and decrypt media.</div></a>
+      <a class="card" href="api-network.html"><div class="card-icon"><i class="fa-solid fa-network-wired"></i></div><div class="card-title">Network</div><div class="card-desc">Node switching, blockchain validation, faucet.</div></a>
+      <a class="card" href="api-events.html"><div class="card-icon"><i class="fa-solid fa-bolt"></i></div><div class="card-title">Events</div><div class="card-desc">All SDK events for message, connection, and group handling.</div></a>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <a href="message-types.html">
+      <span class="nav-dir"> Previous</span>
+      <span class="nav-title">Message Types</span>
+    </a>
+    <a href="api-connection.html" class="next">
+      <span class="nav-dir">Next </span>
+      <span class="nav-title">Connection API</span>
+    </a>
+  </div>
+</main>
+</div>
+  <script src="_reveal.js"></script>
+<script src="_sidebar.js"></script>
+</body>
+</html>

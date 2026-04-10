@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Events API - DChat SDK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link rel="stylesheet" href="_shared.css"/>
+</head>
+<body>
+
+<div class="layout-wrapper">
+<aside class="sidebar">
+  <a href="index.html" class="sidebar-logo">
+    <div class="logo-icon"><img src="Dchat.svg" alt="DChat"></div>
+    <div><div class="logo-text">DChat SDK</div><div class="logo-sub">Developer Docs</div></div>
+  </a>
+  <nav>
+    <div class="sidebar-section"><div class="sidebar-section-title">Overview</div>
+      <a href="index.html"><i class="nav-icon fa-solid fa-house"></i> Introduction</a>
+      <a href="getting-started.html"><i class="nav-icon fa-solid fa-rocket"></i> Getting Started</a>
+      <a href="configuration.html"><i class="nav-icon fa-solid fa-gear"></i> Configuration</a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-section-title">Core APIs</div>
+      <a href="identity.html"><i class="nav-icon fa-solid fa-id-card"></i> Identity &amp; Keys</a>
+      <a href="encryption.html"><i class="nav-icon fa-solid fa-lock"></i> Encryption</a>
+      <a href="messaging.html"><i class="nav-icon fa-solid fa-message"></i> Messaging</a>
+      <a href="groups.html"><i class="nav-icon fa-solid fa-users"></i> Groups</a>
+      <a href="streaming.html"><i class="nav-icon fa-solid fa-tower-broadcast"></i> Streaming</a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-section-title">Reference</div>
+      <a href="message-types.html"><i class="nav-icon fa-solid fa-list"></i> Message Types</a>
+      <a href="api-reference.html"><i class="nav-icon fa-solid fa-code"></i> API Reference</a>
+      <div class="sidebar-submenu">
+        <a href="api-connection.html"><i class="nav-icon fa-solid fa-plug"></i> Connection</a>
+        <a href="api-identity.html"><i class="nav-icon fa-solid fa-id-card"></i> Identity</a>
+        <a href="api-chat-keys.html"><i class="nav-icon fa-solid fa-key"></i> Chat Keys</a>
+        <a href="api-encryption.html"><i class="nav-icon fa-solid fa-lock"></i> Encryption</a>
+        <a href="api-group-keys.html"><i class="nav-icon fa-solid fa-users-gear"></i> Group Keys</a>
+        <a href="api-messaging.html"><i class="nav-icon fa-solid fa-paper-plane"></i> Messaging</a>
+        <a href="api-group-messaging.html"><i class="nav-icon fa-solid fa-users"></i> Group Messaging</a>
+        <a href="api-group-control.html"><i class="nav-icon fa-solid fa-user-gear"></i> Group Control</a>
+        <a href="api-contact.html"><i class="nav-icon fa-solid fa-address-book"></i> Contacts &amp; Profile</a>
+        <a href="api-presence.html"><i class="nav-icon fa-solid fa-circle-dot"></i> Presence</a>
+        <a href="api-media.html"><i class="nav-icon fa-solid fa-photo-film"></i> Media &amp; IPFS</a>
+        <a href="api-network.html"><i class="nav-icon fa-solid fa-network-wired"></i> Network</a>
+        <a href="api-events.html" class="active"><i class="nav-icon fa-solid fa-bolt"></i> Events</a>
+      </div>
+    </div>
+  </nav>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="breadcrumb"><a href="index.html">DChat SDK</a> <span></span> <a href="api-reference.html">API Reference</a> <span></span> Events</div>
+  </div>
+
+  <div class="page-header">
+    <h1>SDK Events</h1>
+    <p class="lead">All events raised by <code>IDChatSDKClient</code> for real-time notifications.</p>
+  </div>
+
+  <div class="callout tip">
+    <span class="callout-icon"><i class="fa-solid fa-info-circle"></i></span>
+    <div class="callout-body">All events are raised on the thread pool. Marshal to the UI thread as required by your framework (e.g., <code>Dispatcher.Dispatch</code> in MAUI, <code>InvokeOnMainThread</code> in Xamarin).</div>
+  </div>
+
+  <div class="section">
+    <h2>Connection Events</h2>
+    
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnConnected</span>
+        <span class="event-type">EventHandler</span>
+        <span class="event-desc">Fires when the stream is successfully established or re-established after a disconnect.</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnDisconnected</span>
+        <span class="event-type">EventHandler</span>
+        <span class="event-desc">Fires when the stream closes (graceful or error).</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Message Lifecycle Events</h2>
+    
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnMessageSent</span>
+        <span class="event-type">EventHandler&lt;QueuedMessage&gt;</span>
+        <span class="event-desc">Fires when a message has been written to the stream (before ACK).</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnMessageFailed</span>
+        <span class="event-type">EventHandler&lt;QueuedMessage&gt;</span>
+        <span class="event-desc">Fires when a message times out waiting for an ACK. The message is moved to the failed cache for retry.</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnMessageStatusChanged</span>
+        <span class="event-type">EventHandler&lt;MessageStatusUpdatedEventArgs&gt;</span>
+        <span class="event-desc">Fires when a message status changes (sent, delivered, read).</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnMessageEditReceived</span>
+        <span class="event-type">EventHandler&lt;MessageEditReceivedEventArgs&gt;</span>
+        <span class="event-desc">Fires when a message edit is received.</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnMessageDeleteReceived</span>
+        <span class="event-type">EventHandler&lt;MessageDeleteReceivedEventArgs&gt;</span>
+        <span class="event-desc">Fires when a message delete is received.</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnMessagePinReceived</span>
+        <span class="event-type">EventHandler&lt;MessagePinReceivedEventArgs&gt;</span>
+        <span class="event-desc">Fires when a message pin/unpin is received.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Typed Message Events</h2>
+    
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnMessageReceived</span>
+        <span class="event-type">EventHandler&lt;DecryptedMessage&gt;</span>
+        <span class="event-desc">Fires when a non-typed message is received (presence, system, fallback messages).</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnTextMessageReceived</span>
+        <span class="event-type">EventHandler&lt;TextMessageReceivedEventArgs&gt;</span>
+        <span class="event-desc">Fires when a text message is received.</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnImageMessageReceived</span>
+        <span class="event-type">EventHandler&lt;ImageMessageReceivedEventArgs&gt;</span>
+        <span class="event-desc">Fires when an image message is received.</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnVideoMessageReceived</span>
+        <span class="event-type">EventHandler&lt;VideoMessageReceivedEventArgs&gt;</span>
+        <span class="event-desc">Fires when a video message is received.</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnAudioMessageReceived</span>
+        <span class="event-type">EventHandler&lt;AudioMessageReceivedEventArgs&gt;</span>
+        <span class="event-desc">Fires when an audio message is received.</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnLocationMessageReceived</span>
+        <span class="event-type">EventHandler&lt;LocationMessageReceivedEventArgs&gt;</span>
+        <span class="event-desc">Fires when a location message is received.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Contact &amp; Profile Events</h2>
+    
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnContactRequestReceived</span>
+        <span class="event-type">EventHandler&lt;ContactRequestReceivedEventArgs&gt;</span>
+        <span class="event-desc">Fires when a contact request is received.</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnContactResponseReceived</span>
+        <span class="event-type">EventHandler&lt;ContactResponseReceivedEventArgs&gt;</span>
+        <span class="event-desc">Fires when a contact response is received (accept/decline/block).</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnProfileRequestReceived</span>
+        <span class="event-type">EventHandler&lt;ProfileRequestReceivedEventArgs&gt;</span>
+        <span class="event-desc">Fires when a profile request is received.</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnProfileUpdateReceived</span>
+        <span class="event-type">EventHandler&lt;ProfileUpdateReceivedEventArgs&gt;</span>
+        <span class="event-desc">Fires when a profile update is received.</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnContactPresenceRequestReceived</span>
+        <span class="event-type">EventHandler&lt;ContactPresenceRequestReceivedEventArgs&gt;</span>
+        <span class="event-desc">Fires when a presence request is received.</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnContactPresenceResponseReceived</span>
+        <span class="event-type">EventHandler&lt;ContactPresenceResponseReceivedEventArgs&gt;</span>
+        <span class="event-desc">Fires when a presence response is received.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Key Management Events</h2>
+    
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnKeyRotationReceived</span>
+        <span class="event-type">EventHandler&lt;KeyRotationMessageData&gt;</span>
+        <span class="event-desc">Fires when a key rotation message is received from a contact.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Group Events</h2>
+    
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnGroupCreateReceived</span>
+        <span class="event-type">EventHandler&lt;GroupCreateReceivedEventArgs&gt;</span>
+        <span class="event-desc">Fires when a group creation message is received.</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnGroupMemberAddReceived</span>
+        <span class="event-type">EventHandler&lt;GroupMemberAddReceivedEventArgs&gt;</span>
+        <span class="event-desc">Fires when a group member add is received.</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnGroupMemberRemoveReceived</span>
+        <span class="event-type">EventHandler&lt;GroupMemberRemoveReceivedEventArgs&gt;</span>
+        <span class="event-desc">Fires when a group member remove is received.</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnGroupAdminUpdateReceived</span>
+        <span class="event-type">EventHandler&lt;GroupAdminUpdateReceivedEventArgs&gt;</span>
+        <span class="event-desc">Fires when a group admin update is received (promote/demote).</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnGroupKeyRotationReceived</span>
+        <span class="event-type">EventHandler&lt;GroupKeyRotationReceivedEventArgs&gt;</span>
+        <span class="event-desc">Fires when a group key rotation is received.</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnGroupNameChangeReceived</span>
+        <span class="event-type">EventHandler&lt;GroupNameChangeReceivedEventArgs&gt;</span>
+        <span class="event-desc">Fires when a group name change is received.</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnGroupDescriptionChangeReceived</span>
+        <span class="event-type">EventHandler&lt;GroupDescriptionChangeReceivedEventArgs&gt;</span>
+        <span class="event-desc">Fires when a group description change is received.</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnGroupPhotoChangeReceived</span>
+        <span class="event-type">EventHandler&lt;GroupPhotoChangeReceivedEventArgs&gt;</span>
+        <span class="event-desc">Fires when a group photo change is received.</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnGroupPhotoRemoveReceived</span>
+        <span class="event-type">EventHandler&lt;GroupPhotoRemoveReceivedEventArgs&gt;</span>
+        <span class="event-desc">Fires when a group photo remove is received.</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnGroupMetadataRequestReceived</span>
+        <span class="event-type">EventHandler&lt;GroupMetadataRequestReceivedEventArgs&gt;</span>
+        <span class="event-desc">Fires when a group metadata request is received.</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnGroupStateHashRequestReceived</span>
+        <span class="event-type">EventHandler&lt;GroupStateHashRequestReceivedEventArgs&gt;</span>
+        <span class="event-desc">Fires when a group state hash request is received.</span>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div>
+        <span class="event-name">OnGroupStateHashResponseReceived</span>
+        <span class="event-type">EventHandler&lt;GroupStateHashResponseReceivedEventArgs&gt;</span>
+        <span class="event-desc">Fires when a group state hash response is received.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Subscribing to Events</h2>
+    <pre><span class="cm">// Subscribe to events after creating the SDK client</span>
+sdk.MessageReceived += OnMessageReceived;
+sdk.TextMessageReceived += OnTextMessage;
+sdk.ImageMessageReceived += OnImageMessage;
+sdk.ContactRequestReceived += OnContactRequest;
+sdk.OnConnected += OnConnected;
+sdk.OnDisconnected += OnDisconnected;
+
+<span class="cm">// Handler example</span>
+<span class="kw">void</span> <span class="met">OnTextMessage</span>(<span class="kw">object</span>? sender, <span class="cls">TextMessageReceivedEventArgs</span> e)
+{
+    <span class="cm">// Marshal to UI thread if needed</span>
+    MainThread.<span class="met">BeginInvokeOnMainThread</span>(() => {
+        <span class="kw">var</span> msg = e.Message;
+        DisplayMessage(msg.SenderDid, msg.Content);
+    });
+}
+
+<span class="cm">// Unsubscribe when disposing</span>
+sdk.MessageReceived -= OnMessageReceived;</pre>
+  </div>
+
+  <div class="page-nav">
+    <a href="api-network.html">
+      <span class="nav-dir"> Previous</span>
+      <span class="nav-title">Network API</span>
+    </a>
+    <a href="message-types.html" class="next">
+      <span class="nav-dir">Next </span>
+      <span class="nav-title">Message Types</span>
+    </a>
+  </div>
+</main>
+</div>
+  <script src="_reveal.js"></script>
+<script src="_sidebar.js"></script>
+</body>
+</html>

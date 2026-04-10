@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Message Types  DChat SDK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link rel="stylesheet" href="_shared.css"/>
+<style>
+  .type-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+    gap: 16px; 
+    margin: 1rem 0; 
+  }
+  
+  .type-card {
+    background: linear-gradient(145deg, rgba(34, 38, 47, 0.95), rgba(26, 29, 35, 0.98));
+    border: 1px solid rgba(91, 141, 238, 0.15);
+    border-radius: 14px;
+    padding: 1.25rem 1.4rem;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    animation: typeCardReveal 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+  }
+  
+  .type-card:nth-child(1) { animation-delay: 0.05s; }
+  .type-card:nth-child(2) { animation-delay: 0.1s; }
+  .type-card:nth-child(3) { animation-delay: 0.15s; }
+  .type-card:nth-child(4) { animation-delay: 0.2s; }
+  .type-card:nth-child(5) { animation-delay: 0.25s; }
+  .type-card:nth-child(6) { animation-delay: 0.3s; }
+  .type-card:nth-child(7) { animation-delay: 0.35s; }
+  .type-card:nth-child(8) { animation-delay: 0.4s; }
+  .type-card:nth-child(9) { animation-delay: 0.45s; }
+  .type-card:nth-child(10) { animation-delay: 0.5s; }
+  
+  @keyframes typeCardReveal {
+    0% {
+      opacity: 0;
+      transform: translateY(15px) scale(0.95);
+    }
+    60% {
+      transform: translateY(-3px) scale(1.01);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  
+  /* Shine sweep effect */
+  .type-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.04),
+      transparent
+    );
+    transition: left 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  
+  .type-card:hover::before {
+    left: 100%;
+  }
+  
+  /* Glow ring */
+  .type-card::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, rgba(91, 141, 238, 0.4), transparent, rgba(91, 141, 238, 0.4));
+    opacity: 0;
+    transition: opacity 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    z-index: -1;
+  }
+  
+  .type-card:hover {
+    border-color: rgba(91, 141, 238, 0.5);
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 
+      0 12px 35px rgba(0, 0, 0, 0.4),
+      0 0 50px rgba(91, 141, 238, 0.15);
+  }
+  
+  .type-card:hover::after {
+    opacity: 1;
+  }
+  
+  .type-card .tc-name { 
+    font-family: var(--mono); 
+    font-size: 14px; 
+    font-weight: 700; 
+    color: var(--green); 
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .type-card .tc-name::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--green);
+  }
+  
+  .type-card .tc-val { 
+    font-family: var(--mono); 
+    font-size: 11px; 
+    color: var(--accent2); 
+    float: right; 
+    margin-top: 2px;
+    padding: 3px 8px;
+    background: rgba(91, 141, 238, 0.1);
+    border-radius: 6px;
+    border: 1px solid rgba(91, 141, 238, 0.2);
+  }
+  
+  .type-card .tc-desc { 
+    font-size: 13px; 
+    color: var(--text-muted); 
+    line-height: 1.6;
+    margin-bottom: 8px;
+  }
+  
+  .type-card .tc-fields { 
+    margin-top: 10px; 
+    padding-top: 10px;
+    border-top: 1px dashed rgba(91, 141, 238, 0.2);
+    font-size: 12px; 
+    color: var(--text-dim); 
+  }
+  
+  .type-card .tc-fields code { 
+    color: #7dd3fc; 
+    font-size: 11.5px;
+    background: rgba(125, 211, 252, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+
+<div class="layout-wrapper">
+<aside class="sidebar">
+  <a href="index.html" class="sidebar-logo">
+    <div class="logo-icon"><img src="Dchat.svg" alt="DChat"></div>
+    <div><div class="logo-text">DChat SDK</div><div class="logo-sub">Developer Docs</div></div>
+  </a>
+  <nav>
+    <div class="sidebar-section"><div class="sidebar-section-title">Overview</div>
+      <a href="index.html"><i class="nav-icon fa-solid fa-house"></i> Introduction</a>
+      <a href="getting-started.html"><i class="nav-icon fa-solid fa-rocket"></i> Getting Started</a>
+      <a href="configuration.html"><i class="nav-icon fa-solid fa-gear"></i> Configuration</a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-section-title">Core APIs</div>
+      <a href="identity.html"><i class="nav-icon fa-solid fa-id-card"></i> Identity &amp; Keys</a>
+      <a href="encryption.html"><i class="nav-icon fa-solid fa-lock"></i> Encryption</a>
+      <a href="messaging.html"><i class="nav-icon fa-solid fa-message"></i> Messaging</a>
+      <a href="groups.html"><i class="nav-icon fa-solid fa-users"></i> Groups</a>
+      <a href="streaming.html"><i class="nav-icon fa-solid fa-tower-broadcast"></i> Streaming</a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-section-title">Reference</div>
+      <a href="message-types.html" class="active"><i class="nav-icon fa-solid fa-list"></i> Message Types</a>
+      <a href="api-reference.html" class="sidebar-toggle"><i class="nav-icon fa-solid fa-code"></i> API Reference</a>
+      <div class="sidebar-submenu">
+        <a href="api-connection.html"><i class="nav-icon fa-solid fa-plug"></i> Connection</a>
+        <a href="api-identity.html"><i class="nav-icon fa-solid fa-id-card"></i> Identity</a>
+        <a href="api-chat-keys.html"><i class="nav-icon fa-solid fa-key"></i> Chat Keys</a>
+        <a href="api-encryption.html"><i class="nav-icon fa-solid fa-lock"></i> Encryption</a>
+        <a href="api-group-keys.html"><i class="nav-icon fa-solid fa-users-gear"></i> Group Keys</a>
+        <a href="api-messaging.html"><i class="nav-icon fa-solid fa-paper-plane"></i> Messaging</a>
+        <a href="api-group-messaging.html"><i class="nav-icon fa-solid fa-users"></i> Group Messaging</a>
+        <a href="api-group-control.html"><i class="nav-icon fa-solid fa-user-gear"></i> Group Control</a>
+        <a href="api-contact.html"><i class="nav-icon fa-solid fa-address-book"></i> Contacts</a>
+        <a href="api-presence.html"><i class="nav-icon fa-solid fa-circle-dot"></i> Presence</a>
+        <a href="api-media.html"><i class="nav-icon fa-solid fa-photo-film"></i> Media</a>
+        <a href="api-network.html"><i class="nav-icon fa-solid fa-network-wired"></i> Network</a>
+        <a href="api-events.html"><i class="nav-icon fa-solid fa-bolt"></i> Events</a>
+      </div>
+    </div>
+  </nav>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="breadcrumb"><a href="index.html">DChat SDK</a> <span></span> Message Types</div>
+  </div>
+
+  <div class="page-header">
+    <h1>Message Types</h1>
+    <p class="lead">Complete reference for the <code>MessageContentType</code> enum and its associated <code>MessageDataBase</code> payload types. Every message sent or received carries one of these types in its <code>MessagePayload.Type</code> field.</p>
+  </div>
+
+  <!-- Media -->
+  <div class="section">
+    <h2><i class="fa-solid fa-message"></i> Content Messages</h2>
+    <div class="type-grid">
+      <div class="type-card">
+        <span class="tc-val">0</span>
+        <div class="tc-name">Text</div>
+        <div class="tc-desc">Plain UTF-8 text message with optional formatting.</div>
+        <div class="tc-fields">Data type: <code>TextMessageData</code>  Fields: <code>Content</code>, <code>FormattedContent</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">1</span>
+        <div class="tc-name">Image</div>
+        <div class="tc-desc">Single image stored on IPFS. Includes thumbnail, dimensions, and optional caption.</div>
+        <div class="tc-fields">Data type: <code>ImageMessageData</code>  Fields: <code>IpfsCid</code>, <code>ThumbnailCid</code>, <code>Width</code>, <code>Height</code>, <code>Caption</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">2</span>
+        <div class="tc-name">Audio</div>
+        <div class="tc-desc">Voice message or audio clip stored on IPFS.</div>
+        <div class="tc-fields">Data type: <code>AudioMessageData</code>  Fields: <code>IpfsCid</code>, <code>DurationSeconds</code>, <code>WaveformData</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">3</span>
+        <div class="tc-name">Video</div>
+        <div class="tc-desc">Video with thumbnail stored on IPFS.</div>
+        <div class="tc-fields">Data type: <code>VideoMessageData</code>  Fields: <code>IpfsCid</code>, <code>ThumbnailCid</code>, <code>Width</code>, <code>Height</code>, <code>DurationSeconds</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">4</span>
+        <div class="tc-name">File</div>
+        <div class="tc-desc">Arbitrary file attachment stored on IPFS.</div>
+        <div class="tc-fields">Data type: <code>FileMessageData</code>  Fields: <code>IpfsCid</code>, <code>Filename</code>, <code>MimeType</code>, <code>FileSizeBytes</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">5</span>
+        <div class="tc-name">Location</div>
+        <div class="tc-desc">GPS coordinates with optional venue name and address.</div>
+        <div class="tc-fields">Data type: <code>LocationMessageData</code>  Fields: <code>Latitude</code>, <code>Longitude</code>, <code>VenueName</code>, <code>Address</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">7</span>
+        <div class="tc-name">Sticker</div>
+        <div class="tc-desc">Animated or static sticker from a sticker pack.</div>
+        <div class="tc-fields">Data type: <code>StickerMessageData</code>  Fields: <code>StickerId</code>, <code>PackId</code>, <code>IpfsCid</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">46</span>
+        <div class="tc-name">Gif</div>
+        <div class="tc-desc">Animated GIF stored on IPFS or linked via URL.</div>
+        <div class="tc-fields">Data type: <code>ImageMessageData</code> (with <code>IsAnimated = true</code>)</div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">60</span>
+        <div class="tc-name">Album</div>
+        <div class="tc-desc">Multiple images sent as a single grouped message.</div>
+        <div class="tc-fields">Data type: <code>AlbumMessageData</code>  Fields: <code>Images[]</code>, <code>Caption</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">47</span>
+        <div class="tc-name">Poll</div>
+        <div class="tc-desc">Interactive poll with multiple choice options.</div>
+        <div class="tc-fields">Data type: <code>PollMessageData</code>  Fields: <code>Question</code>, <code>Options[]</code>, <code>ExpiresAt</code></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Social -->
+  <div class="section">
+    <h2><i class="fa-solid fa-heart"></i> Social Features</h2>
+    <div class="type-grid">
+      <div class="type-card">
+        <span class="tc-val">37</span>
+        <div class="tc-name">MessageReaction</div>
+        <div class="tc-desc">Emoji reaction to a specific message.</div>
+        <div class="tc-fields">Data type: <code>MessageReactionMessageData</code>  Fields: <code>TargetMessageId</code>, <code>Emoji</code>, <code>IsRemoval</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">38</span>
+        <div class="tc-name">MessageEdit</div>
+        <div class="tc-desc">Replaces the content of a previously sent message.</div>
+        <div class="tc-fields">Data type: <code>MessageEditMessageData</code>  Fields: <code>TargetMessageId</code>, <code>NewContent</code>, <code>EditedAt</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">39</span>
+        <div class="tc-name">MessageDelete</div>
+        <div class="tc-desc">Requests deletion of a sent message on all devices.</div>
+        <div class="tc-fields">Data type: <code>MessageDeleteMessageData</code>  Fields: <code>TargetMessageId</code>, <code>DeleteForEveryone</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">40</span>
+        <div class="tc-name">ThreadReply</div>
+        <div class="tc-desc">A reply that starts or continues a message thread.</div>
+        <div class="tc-fields">Data type: <code>ThreadReplyMessageData</code>  Fields: <code>ThreadId</code>, <code>Content</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">41</span>
+        <div class="tc-name">ForwardMessage</div>
+        <div class="tc-desc">A message forwarded from another conversation.</div>
+        <div class="tc-fields">Carried in <code>MessagePayload.IsForwarded</code> + <code>ForwardedFromDid</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">42</span>
+        <div class="tc-name">MessagePin</div>
+        <div class="tc-desc">Pins or unpins a message in the conversation.</div>
+        <div class="tc-fields">Data type: <code>MessagePinMessageData</code>  Fields: <code>TargetMessageId</code>, <code>IsPinned</code></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WebRTC signaling -->
+  <div class="section">
+    <h2><i class="fa-solid fa-phone"></i> WebRTC Call Signaling</h2>
+    <p>These types are sent via <code>SendImmediateAsync</code> (fire-and-forget, no ACK queue) to minimise call setup latency.</p>
+    <div class="type-grid">
+      <div class="type-card">
+        <span class="tc-val">19</span>
+        <div class="tc-name">CallOffer</div>
+        <div class="tc-desc">Initiates a WebRTC call. Contains the SDP offer.</div>
+        <div class="tc-fields">Data type: <code>CallOfferMessageData</code>  Fields: <code>CallId</code>, <code>SdpOffer</code>, <code>IsVideo</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">20</span>
+        <div class="tc-name">CallAnswer</div>
+        <div class="tc-desc">Accepts a call. Contains the SDP answer.</div>
+        <div class="tc-fields">Data type: <code>CallAnswerMessageData</code>  Fields: <code>CallId</code>, <code>SdpAnswer</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">59</span>
+        <div class="tc-name">CallRinging</div>
+        <div class="tc-desc">Recipient device is ringing  sent as early indication before answer.</div>
+        <div class="tc-fields">Data type: <code>CallRingingMessageData</code>  Fields: <code>CallId</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">21</span>
+        <div class="tc-name">ICECandidate</div>
+        <div class="tc-desc">WebRTC ICE candidate for NAT traversal negotiation.</div>
+        <div class="tc-fields">Data type: <code>ICECandidateMessageData</code>  Fields: <code>CallId</code>, <code>Candidate</code>, <code>SdpMid</code>, <code>SdpMLineIndex</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">22</span>
+        <div class="tc-name">IPExchange</div>
+        <div class="tc-desc">Direct IP address hint for peer-to-peer connectivity.</div>
+        <div class="tc-fields">Data type: <code>IPExchangeMessageData</code>  Fields: <code>CallId</code>, <code>IpAddress</code>, <code>Port</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">23</span>
+        <div class="tc-name">CallTermination</div>
+        <div class="tc-desc">Ends an active call. Includes the termination reason.</div>
+        <div class="tc-fields">Data type: <code>CallTerminationMessageData</code>  Fields: <code>CallId</code>, <code>Reason</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">24</span>
+        <div class="tc-name">GroupCallUpdate</div>
+        <div class="tc-desc">Status update for a group call (member joined, left, or call ended).</div>
+        <div class="tc-fields">Data type: <code>GroupCallUpdateMessageData</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">25</span>
+        <div class="tc-name">CallQuality</div>
+        <div class="tc-desc">Real-time call quality metrics report (packet loss, jitter, latency).</div>
+        <div class="tc-fields">Data type: <code>CallQualityMessageData</code></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contacts -->
+  <div class="section">
+    <h2><i class="fa-solid fa-handshake"></i> Contact &amp; Presence</h2>
+    <div class="type-grid">
+      <div class="type-card">
+        <span class="tc-val">15</span>
+        <div class="tc-name">ContactRequest</div>
+        <div class="tc-desc">Initiates a contact request. Contains sender's public key and profile stub.</div>
+        <div class="tc-fields">Data type: <code>ContactRequestMessageData</code>  Fields: <code>SenderDid</code>, <code>SenderPublicKey</code>, <code>Message</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">16</span>
+        <div class="tc-name">ContactResponse</div>
+        <div class="tc-desc">Accepts or rejects a contact request. On accept, returns the responder's chat public key.</div>
+        <div class="tc-fields">Data type: <code>ContactResponseMessageData</code>  Fields: <code>Accepted</code>, <code>ChatPublicKey</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">17</span>
+        <div class="tc-name">ProfileUpdate</div>
+        <div class="tc-desc">Pushes latest profile data (name, avatar CID, chat public key) to a contact.</div>
+        <div class="tc-fields">Data type: <code>ProfileUpdateMessageData</code>  Fields: <code>Username</code>, <code>DisplayName</code>, <code>AvatarIpfsCid</code>, <code>ChatPublicKey</code>, <code>UpdatedFields</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">18</span>
+        <div class="tc-name">ProfileRequest</div>
+        <div class="tc-desc">Asks a contact to re-send their current profile.</div>
+        <div class="tc-fields">Data type: <code>ProfileRequestMessageData</code>  Fields: <code>RequestedFields</code>, <code>RequestReason</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">12</span>
+        <div class="tc-name">ContactPresenceRequest</div>
+        <div class="tc-desc">Pings a contact for their current online/away status.</div>
+        <div class="tc-fields">Data type: <code>ContactPresenceRequestMessageData</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">13</span>
+        <div class="tc-name">ContactPresenceResponse</div>
+        <div class="tc-desc">Responds with current presence state (online, away, DND).</div>
+        <div class="tc-fields">Data type: <code>ContactPresenceResponseMessageData</code>  Fields: <code>Status</code>, <code>LastSeen</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">14</span>
+        <div class="tc-name">TypingIndicator</div>
+        <div class="tc-desc">Notifies the recipient that the sender is currently composing a message.</div>
+        <div class="tc-fields">Data type: <code>TypingIndicatorMessageData</code>  Fields: <code>IsTyping</code></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key management -->
+  <div class="section">
+    <h2><i class="fa-solid fa-key"></i> Key Management</h2>
+    <div class="type-grid">
+      <div class="type-card">
+        <span class="tc-val">10</span>
+        <div class="tc-name">KeyRotation</div>
+        <div class="tc-desc">Notifies a contact of a new chat public key after E2EE key rotation.</div>
+        <div class="tc-fields">Data type: <code>KeyRotationMessageData</code>  Fields: <code>NewChatPublicKey</code>, <code>KeyGeneration</code>, <code>Reason</code></div>
+      </div>
+      <div class="type-card">
+        <span class="tc-val">11</span>
+        <div class="tc-name">KeyVerification</div>
+        <div class="tc-desc">Challenge/response for safety-number verification (QR code scanning).</div>
+        <div class="tc-fields">Data type: <code>KeyVerificationMessageData</code></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Group management -->
+  <div class="section">
+    <h2><i class="fa-solid fa-users"></i> Group Management</h2>
+    <table class="enum-table">
+      <tr><th>Name</th><th>Value</th><th>Description</th></tr>
+      <tr><td>GroupCreate</td><td>26</td><td>Initial group creation. Sent to all founding members along with the first sender key.</td></tr>
+      <tr><td>GroupMemberAdd</td><td>27</td><td>A new member was added. Triggers sender key distribution.</td></tr>
+      <tr><td>GroupMemberRemove</td><td>28</td><td>A member was removed. Triggers sender key rotation.</td></tr>
+      <tr><td>GroupAdminUpdate</td><td>29</td><td>Admin privileges granted or revoked for a member.</td></tr>
+      <tr><td>GroupKeyRotation</td><td>30</td><td>New sender key distributed to all current members.</td></tr>
+      <tr><td>GroupNameChange</td><td>51</td><td>Group name was changed by an admin.</td></tr>
+      <tr><td>GroupDescriptionChange</td><td>52</td><td>Group description was updated.</td></tr>
+      <tr><td>GroupPhotoChange</td><td>53</td><td>Group avatar image changed.</td></tr>
+      <tr><td>GroupPhotoRemove</td><td>54</td><td>Group avatar removed.</td></tr>
+      <tr><td>GroupMemberJoinByLink</td><td>55</td><td>Member joined via an invite link.</td></tr>
+      <tr><td>GroupMemberJoinByRequest</td><td>56</td><td>Member join request submitted (requires admin approval).</td></tr>
+      <tr><td>GroupSenderKeyUpdate</td><td>58</td><td>Sender key update distributed to a specific new member.</td></tr>
+      <tr><td>GroupStateHashRequest</td><td>49</td><td>Requests another member's state hash for consistency verification.</td></tr>
+      <tr><td>GroupStateHashResponse</td><td>50</td><td>Returns the local state hash and version.</td></tr>
+      <tr><td>GroupMetadataRequest</td><td>57</td><td>Requests full group metadata snapshot from an admin.</td></tr>
+    </table>
+  </div>
+
+  <!-- System -->
+  <div class="section">
+    <h2><i class="fa-solid fa-gear"></i> System Messages</h2>
+    <table class="enum-table">
+      <tr><th>Name</th><th>Value</th><th>Description</th></tr>
+      <tr><td>System</td><td>8</td><td>General system notification (e.g., "Alice joined the conversation").</td></tr>
+      <tr><td>DeliveryStatus</td><td>9</td><td>Delivery receipt confirming message was received and decrypted.</td></tr>
+      <tr><td>Error</td><td>45</td><td>Protocol-level error (decryption failure, unknown type, etc.).</td></tr>
+      <tr><td>DeviceSyncRequest</td><td>43</td><td>Requests message history from another linked device.</td></tr>
+      <tr><td>DeviceSyncResponse</td><td>44</td><td>Returns message batch in response to a sync request.</td></tr>
+    </table>
+  </div>
+
+  <!-- How to handle -->
+  <div class="section">
+    <h2>Handling Incoming Messages</h2>
+    <pre><span class="kw">void</span> <span class="met">HandleMessage</span>(<span class="cls">DecryptedMessage</span> msg)
+{
+    <span class="kw">switch</span> (msg.Payload.Type)
+    {
+        <span class="kw">case</span> <span class="cls">MessageContentType</span>.Text:
+            <span class="kw">var</span> text = (<span class="cls">TextMessageData</span>)msg.Payload.Data;
+            <span class="met">ShowMessage</span>(text.Content);
+            <span class="kw">break</span>;
+
+        <span class="kw">case</span> <span class="cls">MessageContentType</span>.Image:
+            <span class="kw">var</span> img = (<span class="cls">ImageMessageData</span>)msg.Payload.Data;
+            <span class="met">LoadImage</span>(img.IpfsCid, img.ThumbnailCid);
+            <span class="kw">break</span>;
+
+        <span class="kw">case</span> <span class="cls">MessageContentType</span>.KeyRotation:
+            <span class="kw">var</span> kr = (<span class="cls">KeyRotationMessageData</span>)msg.Payload.Data;
+            <span class="met">UpdateContactPublicKey</span>(msg.SenderDid, kr.NewChatPublicKey);
+            <span class="kw">break</span>;
+
+        <span class="kw">case</span> <span class="cls">MessageContentType</span>.CallOffer:
+            <span class="kw">var</span> offer = (<span class="cls">CallOfferMessageData</span>)msg.Payload.Data;
+            <span class="met">ShowIncomingCallUI</span>(offer.CallId, offer.IsVideo);
+            <span class="kw">break</span>;
+
+        <span class="cm">// ... handle other types</span>
+    }
+}</pre>
+  </div>
+
+  <div class="page-nav">
+    <a href="streaming.html">
+      <span class="nav-dir"> Previous</span>
+      <span class="nav-title">Streaming</span>
+    </a>
+    <a href="index.html" class="next">
+      <span class="nav-dir"> Back to</span>
+      <span class="nav-title">Introduction</span>
+    </a>
+  </div>
+</main>
+</div>
+  <script src="_reveal.js"></script>
+<script src="_sidebar.js"></script>
+</body>
+</html>
+
+

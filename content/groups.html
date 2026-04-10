@@ -1,0 +1,293 @@
+<div class="topbar">
+  <div class="breadcrumb"><a href="#/intro" data-page="intro">DChat SDK</a> <span>></span> Groups</div>
+</div>
+
+<div class="page-header">
+  <h1>Groups</h1>
+  <p class="lead">Group chats use symmetric sender keys for efficient encryption and a cryptographic state snapshot system to keep members in sync  no central server required.</p>
+</div>
+
+<!-- Architecture -->
+<div class="section">
+  <h2>Architecture</h2>
+  <div class="infographic">
+    <div class="infographic-title">Group Chat Lifecycle</div>
+    
+    <div class="flow-diagram">
+      <div class="flow-step">
+        <div class="flow-node">
+          <div class="flow-node-icon"><i class="fa-solid fa-user-plus"></i></div>
+          <div class="flow-node-content">
+            <div class="flow-node-title">Admin Creates Group</div>
+            <div class="flow-node-desc">GroupCreateMessageData broadcast</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flow-connector"><div class="flow-arrow"></div></div>
+      
+      <div class="flow-step">
+        <div class="flow-node highlight">
+          <div class="flow-node-icon"><i class="fa-solid fa-key"></i></div>
+          <div class="flow-node-content">
+            <div class="flow-node-title">SenderKey Distribution</div>
+            <div class="flow-node-desc">E2EE envelope to each member</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flow-connector"><div class="flow-arrow"></div></div>
+      
+      <div class="flow-step">
+        <div class="flow-node" style="border-color: rgba(62, 207, 142, 0.4); background: rgba(62, 207, 142, 0.08);">
+          <div class="flow-node-icon" style="background: rgba(62, 207, 142, 0.15);"><i class="fa-solid fa-unlock" style="color: #3ecf8e;"></i></div>
+          <div class="flow-node-content">
+            <div class="flow-node-title" style="color: #3ecf8e;">Members Store Key</div>
+            <div class="flow-node-desc">Ready to decrypt group messages</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flow-connector"><div class="flow-arrow"></div></div>
+      
+      <div class="flow-step">
+        <div class="flow-node">
+          <div class="flow-node-icon"><i class="fa-solid fa-paper-plane"></i></div>
+          <div class="flow-node-content">
+            <div class="flow-node-title">Send Group Message</div>
+            <div class="flow-node-desc">AES-GCM(senderKey) broadcast</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flow-connector"><div class="flow-arrow"></div></div>
+      
+      <div class="flow-step">
+        <div class="flow-node" style="border-color: rgba(240, 160, 75, 0.4); background: rgba(240, 160, 75, 0.08);">
+          <div class="flow-node-icon" style="background: rgba(240, 160, 75, 0.15);"><i class="fa-solid fa-rotate" style="color: #22d3ee;"></i></div>
+          <div class="flow-node-content">
+            <div class="flow-node-title" style="color: #22d3ee;">Member Change</div>
+            <div class="flow-node-desc">SenderKey rotation triggered</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flow-connector"><div class="flow-arrow"></div></div>
+      
+      <div class="flow-step">
+        <div class="flow-node" style="border-color: rgba(224, 92, 110, 0.4); background: rgba(224, 92, 110, 0.08);">
+          <div class="flow-node-icon" style="background: rgba(224, 92, 110, 0.15);"><i class="fa-solid fa-ban" style="color: #e05c6e;"></i></div>
+          <div class="flow-node-content">
+            <div class="flow-node-title" style="color: #e05c6e;">Old Key Invalidated</div>
+            <div class="flow-node-desc">Removed members lose access</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Group messaging methods -->
+<div class="section">
+  <h2>Group Messaging</h2>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task&lt;bool&gt;</span> <span class="name">SendGroupTextMessageAsync</span>(...)
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Encrypts a text message with the sender's symmetric key and delivers it to all group members. Internally calls <code>IGroupMemberProvider.GetGroupMembersAsync</code> to resolve the delivery list.</p>
+      <table class="param-table">
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>groupId</td><td>string</td><td>Group identifier.</td></tr>
+        <tr><td>content</td><td>string</td><td>Message text.</td></tr>
+        <tr><td>senderDid</td><td>string</td><td>DID of the sender.</td></tr>
+        <tr><td>senderWalletAddress</td><td>string</td><td>Sender's wallet address for gRPC auth.</td></tr>
+        <tr><td>chatId</td><td>string</td><td>Chat ID (same as groupId for groups).</td></tr>
+        <tr><td>replyToMessageId</td><td>string?</td><td>Optional reply reference.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task&lt;bool&gt;</span> <span class="name">SendGroupImageMessageAsync</span>(...)
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Uploads the image to IPFS, then distributes an <code>ImageMessageData</code> payload symmetrically to all members.</p>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task&lt;bool&gt;</span> <span class="name">SendGroupVideoMessageAsync</span>(...)
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Uploads video to IPFS and sends a <code>VideoMessageData</code> symmetrically to all members.</p>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task&lt;bool&gt;</span> <span class="name">SendGroupAudioMessageAsync</span>(...)
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Uploads audio and sends an <code>AudioMessageData</code> symmetrically.</p>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task&lt;bool&gt;</span> <span class="name">SendGroupFileMessageAsync</span>(...)
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Uploads a file and sends a <code>FileMessageData</code> symmetrically.</p>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task&lt;byte[]&gt;</span> <span class="name">DownloadGroupMediaAsync</span>(...)
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Downloads and decrypts a media file from IPFS for a group message. The SDK fetches the appropriate sender key from secure storage and decrypts the IPFS payload.</p>
+    </div>
+  </div>
+</div>
+
+<!-- IGroupMemberProvider -->
+<div class="section">
+  <h2>Implementing IGroupMemberProvider</h2>
+  <p>The SDK has no database - it delegates group-membership queries to your application via <code>IGroupMemberProvider</code>. You must implement this interface and pass it via <code>SetGroupMemberProvider()</code> in the options builder.</p>
+
+  <pre><span class="kw">public class</span> <span class="cls">GroupMemberProvider</span> : <span class="cls">IGroupMemberProvider</span>
+{
+    <span class="kw">private readonly</span> <span class="cls">IGroupRepository</span> _groupRepository;
+    <span class="kw">private readonly</span> <span class="cls">IUserRepository</span> _userRepository;
+
+    <span class="kw">public</span> <span class="met">GroupMemberProvider</span>(
+        <span class="cls">IGroupRepository</span> groupRepository,
+        <span class="cls">IUserRepository</span> userRepository)
+    {
+        _groupRepository = groupRepository ?? <span class="kw">throw new</span> <span class="cls">ArgumentNullException</span>(<span class="kw">nameof</span>(groupRepository));
+        _userRepository = userRepository ?? <span class="kw">throw new</span> <span class="cls">ArgumentNullException</span>(<span class="kw">nameof</span>(userRepository));
+    }
+
+    <span class="kw">public async</span> <span class="cls">Task</span>&lt;<span class="kw">bool</span>&gt; <span class="met">IsGroupAsync</span>(<span class="kw">string</span> chatId)
+    {
+        <span class="kw">if</span> (<span class="kw">string</span>.IsNullOrEmpty(chatId))
+            <span class="kw">return false</span>;
+
+        <span class="kw">var</span> group = <span class="kw">await</span> _groupRepository.<span class="met">GetByIdAsync</span>(chatId);
+        <span class="kw">return</span> group != <span class="kw">null</span>;
+    }
+
+    <span class="kw">public async</span> <span class="cls">Task</span>&lt;<span class="cls">IReadOnlyList</span>&lt;<span class="cls">GroupMemberInfo</span>&gt;&gt; <span class="met">GetGroupMembersAsync</span>(<span class="kw">string</span> groupId)
+    {
+        <span class="kw">var</span> members = <span class="kw">await</span> _groupRepository.<span class="met">GetGroupMembersAsync</span>(groupId);
+        <span class="kw">var</span> memberInfoList = <span class="kw">new</span> <span class="cls">List</span>&lt;<span class="cls">GroupMemberInfo</span>&gt;();
+
+        <span class="kw">foreach</span> (<span class="kw">var</span> member <span class="kw">in</span> members.<span class="met">Where</span>(m => m.IsActive))
+        {
+            <span class="kw">var</span> memberInfo = <span class="kw">await</span> <span class="met">GetMemberInfoAsync</span>(member.MemberDid);
+            <span class="kw">if</span> (memberInfo != <span class="kw">null</span>)
+                memberInfoList.<span class="met">Add</span>(memberInfo);
+        }
+
+        <span class="kw">return</span> memberInfoList;
+    }
+
+    <span class="kw">public async</span> <span class="cls">Task</span>&lt;<span class="cls">GroupMemberInfo</span>&gt; <span class="met">GetMemberInfoAsync</span>(<span class="kw">string</span> memberDid)
+    {
+        <span class="kw">var</span> user = <span class="kw">await</span> _userRepository.<span class="met">GetUserByDidAsync</span>(memberDid);
+
+        <span class="kw">if</span> (user == <span class="kw">null</span> || <span class="kw">string</span>.IsNullOrWhiteSpace(user.WalletAddress))
+            <span class="kw">return null</span>;
+
+        <span class="kw">var</span> displayName = !<span class="kw">string</span>.IsNullOrEmpty(user.Nickname) ? user.Nickname
+            : user.DisplayName ?? user.Username ?? memberDid[..8];
+
+        <span class="kw">return new</span> <span class="cls">GroupMemberInfo</span>
+        {
+            Did           = memberDid,
+            WalletAddress = user.WalletAddress,
+            ChatPublicKey = user.PublicKey,
+            DisplayName   = displayName
+        };
+    }
+}</pre>
+
+  <h3>GroupMemberInfo</h3>
+  <table class="prop-table">
+    <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+    <tr><td class="pname">Did</td><td class="ptype">string</td><td>DID of the member (<code>did:dchat:username</code>). Used for key storage lookups.</td></tr>
+    <tr><td class="pname">WalletAddress</td><td class="ptype">string</td><td>Bech32 wallet address. Used for gRPC message routing.</td></tr>
+    <tr><td class="pname">ChatPublicKey</td><td class="ptype">string</td><td>Hex-encoded Secp256k1 key for encrypting sender-key payloads sent to this member.</td></tr>
+    <tr><td class="pname">DisplayName</td><td class="ptype">string?</td><td>Human-readable name. UI only - not used by the SDK for any cryptographic operations.</td></tr>
+  </table>
+</div>
+
+<!-- Group state snapshot -->
+<div class="section">
+  <h2>Group State Snapshots</h2>
+  <p>When an admin adds or removes a member, or rotates a sender key, they broadcast a <code>GroupStateSnapshot</code> to bring new members up to speed. The snapshot is hashed, signed, and verified before being applied.</p>
+
+  <h3>GroupStateSnapshot fields</h3>
+  <table class="prop-table">
+    <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+    <tr><td class="pname">GroupId</td><td class="ptype">string</td><td>Unique group identifier.</td></tr>
+    <tr><td class="pname">GroupName</td><td class="ptype">string</td><td>Group display name.</td></tr>
+    <tr><td class="pname">GroupAvatarCid</td><td class="ptype">string?</td><td>IPFS CID of the group avatar.</td></tr>
+    <tr><td class="pname">StateVersion</td><td class="ptype">long</td><td>Monotonically increasing version. Clients reject stale snapshots.</td></tr>
+    <tr><td class="pname">StateHash</td><td class="ptype">string</td><td>SHA-256 of canonical JSON. Used to verify integrity.</td></tr>
+    <tr><td class="pname">KeyGeneration</td><td class="ptype">int</td><td>Current sender-key generation number.</td></tr>
+    <tr><td class="pname">EncryptedGroupPrivateKey</td><td class="ptype">string</td><td>Group private key encrypted per-recipient.</td></tr>
+    <tr><td class="pname">Members</td><td class="ptype">List&lt;GroupMemberSnapshot&gt;</td><td>Full member list at snapshot time.</td></tr>
+    <tr><td class="pname">AdminDids</td><td class="ptype">List&lt;string&gt;</td><td>DIDs of members with admin privileges.</td></tr>
+  </table>
+</div>
+
+<!-- Group message types -->
+<div class="section">
+  <h2>Group Protocol Message Types</h2>
+  <p>These <code>MessageContentType</code> values are sent as group management events. Clients that receive them update their local state accordingly.</p>
+  <table class="enum-table">
+    <tr><th>Type</th><th>Value</th><th>Description</th></tr>
+    <tr><td>GroupCreate</td><td>26</td><td>Initial group creation event sent to all founding members.</td></tr>
+    <tr><td>GroupMemberAdd</td><td>27</td><td>New member added  triggers sender key distribution to the new member.</td></tr>
+    <tr><td>GroupMemberRemove</td><td>28</td><td>Member removed  triggers sender key rotation for remaining members.</td></tr>
+    <tr><td>GroupAdminUpdate</td><td>29</td><td>Admin privileges granted or revoked.</td></tr>
+    <tr><td>GroupKeyRotation</td><td>30</td><td>New sender key distributed after rotation.</td></tr>
+    <tr><td>GroupNameChange</td><td>51</td><td>Group name updated.</td></tr>
+    <tr><td>GroupDescriptionChange</td><td>52</td><td>Group description updated.</td></tr>
+    <tr><td>GroupPhotoChange</td><td>53</td><td>Group avatar updated.</td></tr>
+    <tr><td>GroupPhotoRemove</td><td>54</td><td>Group avatar removed.</td></tr>
+    <tr><td>GroupSenderKeyUpdate</td><td>58</td><td>Sender key distributed to a specific member.</td></tr>
+    <tr><td>GroupStateHashRequest</td><td>49</td><td>Request another member's state hash for consistency check.</td></tr>
+    <tr><td>GroupStateHashResponse</td><td>50</td><td>Response with the responder's current state hash.</td></tr>
+    <tr><td>GroupMetadataRequest</td><td>57</td><td>Request full group metadata from an admin.</td></tr>
+  </table>
+</div>
+
+<div class="page-nav">
+  <a href="#/messaging" data-page="messaging">
+    <span class="nav-dir"> Previous</span>
+    <span class="nav-title">Messaging</span>
+  </a>
+  <a href="#/streaming" data-page="streaming" class="next">
+    <span class="nav-dir">Next </span>
+    <span class="nav-title">Streaming</span>
+  </a>
+</div>

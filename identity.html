@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Identity &amp; Keys  DChat SDK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link rel="stylesheet" href="_shared.css"/>
+</head>
+<body>
+
+<div class="layout-wrapper">
+<aside class="sidebar">
+  <a href="index.html" class="sidebar-logo">
+    <div class="logo-icon"><img src="Dchat.svg" alt="DChat"></div>
+    <div><div class="logo-text">DChat SDK</div><div class="logo-sub">Developer Docs</div></div>
+  </a>
+  <nav>
+    <div class="sidebar-section"><div class="sidebar-section-title">Overview</div>
+      <a href="index.html"><i class="nav-icon fa-solid fa-house"></i> Introduction</a>
+      <a href="getting-started.html"><i class="nav-icon fa-solid fa-rocket"></i> Getting Started</a>
+      <a href="configuration.html"><i class="nav-icon fa-solid fa-gear"></i> Configuration</a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-section-title">Core APIs</div>
+      <a href="identity.html" class="active"><i class="nav-icon fa-solid fa-id-card"></i> Identity &amp; Keys</a>
+      <a href="encryption.html"><i class="nav-icon fa-solid fa-lock"></i> Encryption</a>
+      <a href="messaging.html"><i class="nav-icon fa-solid fa-message"></i> Messaging</a>
+      <a href="groups.html"><i class="nav-icon fa-solid fa-users"></i> Groups</a>
+      <a href="streaming.html"><i class="nav-icon fa-solid fa-tower-broadcast"></i> Streaming</a>
+    </div>
+    <div class="sidebar-section"><div class="sidebar-section-title">Reference</div>
+      <a href="message-types.html"><i class="nav-icon fa-solid fa-list"></i> Message Types</a>
+      <a href="api-reference.html" class="sidebar-toggle"><i class="nav-icon fa-solid fa-code"></i> API Reference</a>
+      <div class="sidebar-submenu">
+        <a href="api-connection.html"><i class="nav-icon fa-solid fa-plug"></i> Connection</a>
+        <a href="api-identity.html"><i class="nav-icon fa-solid fa-id-card"></i> Identity</a>
+        <a href="api-chat-keys.html"><i class="nav-icon fa-solid fa-key"></i> Chat Keys</a>
+        <a href="api-encryption.html"><i class="nav-icon fa-solid fa-lock"></i> Encryption</a>
+        <a href="api-group-keys.html"><i class="nav-icon fa-solid fa-users-gear"></i> Group Keys</a>
+        <a href="api-messaging.html"><i class="nav-icon fa-solid fa-paper-plane"></i> Messaging</a>
+        <a href="api-group-messaging.html"><i class="nav-icon fa-solid fa-users"></i> Group Messaging</a>
+        <a href="api-group-control.html"><i class="nav-icon fa-solid fa-user-gear"></i> Group Control</a>
+        <a href="api-contact.html"><i class="nav-icon fa-solid fa-address-book"></i> Contacts</a>
+        <a href="api-presence.html"><i class="nav-icon fa-solid fa-circle-dot"></i> Presence</a>
+        <a href="api-media.html"><i class="nav-icon fa-solid fa-photo-film"></i> Media</a>
+        <a href="api-network.html"><i class="nav-icon fa-solid fa-network-wired"></i> Network</a>
+        <a href="api-events.html"><i class="nav-icon fa-solid fa-bolt"></i> Events</a>
+      </div>
+    </div>
+  </nav>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="breadcrumb"><a href="index.html">DChat SDK</a> <span></span> Identity &amp; Keys</div>
+  </div>
+
+  <div class="page-header">
+    <h1>Identity &amp; Keys</h1>
+    <p class="lead">DChat identities are self-sovereign  a BIP39 seed phrase is the root of trust. No email, no phone, no server-side account creation.</p>
+  </div>
+
+  <!-- Concepts -->
+  <div class="section">
+    <h2>Concepts</h2>
+    <p>Every DChat user has two distinct key layers:</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:1rem 0">
+      <div class="card">
+        <div class="card-icon"><i class="fa-solid fa-link"></i></div>
+        <div class="card-title">Identity Key (DChatChainKeyPair)</div>
+        <div class="card-desc">Long-lived Secp256k1 key derived from the seed phrase. Used to sign blockchain transactions (register username) and authenticate to the gRPC server. Never rotated.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon"><i class="fa-solid fa-rotate"></i></div>
+        <div class="card-title">Chat Key (ChatKeyPair)</div>
+        <div class="card-desc">Short-lived Secp256k1 key used exclusively for E2EE message encryption. Rotates automatically based on message count or age for forward secrecy.</div>
+      </div>
+    </div>
+
+    <h3>DID format</h3>
+    <p>Decentralised Identifiers follow the pattern <code>did:dchat:&lt;username&gt;</code>. A DID links a human-readable username to an on-chain wallet address and a current chat public key.</p>
+  </div>
+
+  <!-- Seed phrase -->
+  <div class="section">
+    <h2>Seed Phrase Operations</h2>
+
+    <div class="method-block">
+      <div class="method-header">
+        <div class="method-sig">
+          <span class="ret">Task&lt;string&gt;</span> <span class="name">GenerateSeedPhraseAsync</span>(<span class="type">int</span> <span class="param">wordCount</span> = <span class="num">24</span>)
+        </div>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Generates a cryptographically secure BIP39 mnemonic. The phrase is the master secret from which all keys are derived  store it offline, never in plaintext on the device.</p>
+        <table class="param-table">
+          <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+          <tr><td>wordCount</td><td>int</td><td>12 or 24 words. 24 words = 256 bits of entropy (recommended).</td></tr>
+        </table>
+        <pre><span class="kw">string</span> mnemonic = <span class="kw">await</span> sdk.<span class="met">GenerateSeedPhraseAsync</span>(<span class="num">24</span>);
+<span class="cm">// "abandon ability able about above absent absorb ..."</span></pre>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <div class="method-sig">
+          <span class="ret">Task&lt;DChatChainKeyPair&gt;</span> <span class="name">RestoreFromSeedPhraseAsync</span>(<span class="type">string</span> <span class="param">seedPhrase</span>, <span class="type">string</span> <span class="param">derivationPath</span> = <span class="str">"m/44'/118'/0'/0/0"</span>)
+        </div>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Deterministically derives a <code>DChatChainKeyPair</code> from a BIP39 mnemonic using the BIP44 derivation path. Produces the same key pair on any device given the same inputs.</p>
+        <table class="param-table">
+          <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+          <tr><td>seedPhrase</td><td>string</td><td>Space-separated BIP39 mnemonic (12 or 24 words).</td></tr>
+          <tr><td>derivationPath</td><td>string</td><td>BIP44 path. Default uses Cosmos coin type 118.</td></tr>
+        </table>
+        <pre><span class="cls">DChatChainKeyPair</span> kp = <span class="kw">await</span> sdk.<span class="met">RestoreFromSeedPhraseAsync</span>(
+    <span class="str">"word1 word2 ... word24"</span>);</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key storage -->
+  <div class="section">
+    <h2>Key Storage</h2>
+    <p>Key pairs are stored in the platform's secure storage (Android Keystore / iOS Secure Enclave on device). An optional password adds an extra AES-256 encryption layer over the stored bytes.</p>
+
+    <div class="method-block">
+      <div class="method-header">
+        <div class="method-sig">
+          <span class="ret">Task</span> <span class="name">StoreKeyPairAsync</span>(<span class="type">DChatChainKeyPair</span> <span class="param">keyPair</span>, <span class="type">string?</span> <span class="param">password</span> = <span class="num">null</span>)
+        </div>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Persists the identity key pair in secure storage. Pass a <code>password</code> to require it on every retrieval (useful for PIN-protected accounts).</p>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <div class="method-sig">
+          <span class="ret">Task&lt;DChatChainKeyPair?&gt;</span> <span class="name">GetKeyPairAsync</span>(<span class="type">string</span> <span class="param">walletAddress</span>, <span class="type">string?</span> <span class="param">password</span> = <span class="num">null</span>)
+        </div>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Retrieves a stored key pair. Returns <code>null</code> if not found. Throws if the password is wrong.</p>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <div class="method-sig">
+          <span class="ret">Task&lt;bool&gt;</span> <span class="name">HasKeyPairAsync</span>(<span class="type">string</span> <span class="param">walletAddress</span>)
+        </div>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Checks whether a key pair exists for the wallet address without decrypting it. Useful for onboarding flow gating.</p>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <div class="method-sig">
+          <span class="ret">Task</span> <span class="name">DeleteKeyPairAsync</span>(<span class="type">string</span> <span class="param">walletAddress</span>)
+        </div>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Permanently removes the key pair from secure storage. This is irreversible  the identity can only be restored from the seed phrase.</p>
+        <div class="callout danger">
+          <span class="callout-icon"><i class="fa-solid fa-circle-exclamation"></i></span>
+          <div class="callout-body"><strong>Irreversible.</strong> Ensure the user has backed up their seed phrase before calling this.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Blockchain identity -->
+  <div class="section">
+    <h2>Blockchain Identity</h2>
+
+    <div class="method-block">
+      <div class="method-header">
+        <div class="method-sig">
+          <span class="ret">Task&lt;BlockchainIdentityResult&gt;</span> <span class="name">CreateIdentityAsync</span>(<span class="type">string</span> <span class="param">username</span>, <span class="type">string?</span> <span class="param">password</span> = <span class="num">null</span>)
+        </div>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Generates a key pair, stores it securely, requests faucet funding (testnet), and registers the username on-chain in a single call. Returns the identity and transaction hash.</p>
+        <table class="param-table">
+          <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+          <tr><td>username</td><td>string</td><td>330 character alphanumeric username. Must be unique on-chain.</td></tr>
+          <tr><td>password</td><td>string?</td><td>Optional password to protect the stored key pair.</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <div class="method-sig">
+          <span class="ret">Task&lt;bool&gt;</span> <span class="name">CheckUsernameAvailabilityAsync</span>(<span class="type">string</span> <span class="param">username</span>)
+        </div>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Queries the blockchain to check if the username is free. Call before <code>CreateIdentityAsync</code> to give fast user feedback.</p>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <div class="method-sig">
+          <span class="ret">Task&lt;BlockchainIdentity?&gt;</span> <span class="name">GetIdentityAsync</span>(<span class="type">string</span> <span class="param">identifier</span>)
+        </div>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Fetches an identity by wallet address <em>or</em> username. Returns <code>null</code> if no matching identity is found on-chain.</p>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <div class="method-sig">
+          <span class="ret">Task&lt;string?&gt;</span> <span class="name">GetUserProfileUsernameAsync</span>(<span class="type">string</span> <span class="param">walletAddress</span>)
+        </div>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Resolves a wallet address to its registered username. Returns an empty string (not null) when no profile is found.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Signing -->
+  <div class="section">
+    <h2>Signing &amp; Verification</h2>
+
+    <div class="method-block">
+      <div class="method-header">
+        <div class="method-sig">
+          <span class="ret">Task&lt;string&gt;</span> <span class="name">SignMessageAsync</span>(<span class="type">string</span> <span class="param">message</span>, <span class="type">string</span> <span class="param">walletAddress</span>, <span class="type">string?</span> <span class="param">password</span> = <span class="num">null</span>)
+        </div>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Signs an arbitrary message with the identity private key using Secp256k1. Returns a base64-encoded DER signature. Used for gRPC authentication handshakes and ADR-036 off-chain signing.</p>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-header">
+        <div class="method-sig">
+          <span class="ret">Task&lt;bool&gt;</span> <span class="name">VerifySignatureAsync</span>(<span class="type">string</span> <span class="param">message</span>, <span class="type">string</span> <span class="param">signature</span>, <span class="type">string</span> <span class="param">publicKey</span>)
+        </div>
+      </div>
+      <div class="method-body">
+        <p class="method-desc">Verifies a Secp256k1 signature against a message and public key. Use this to validate contact-request authenticity or any signed protocol message.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- BlockchainIdentity model -->
+  <div class="section">
+    <h2>BlockchainIdentity Model</h2>
+    <table class="prop-table">
+      <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+      <tr><td class="pname">WalletAddress</td><td class="ptype">string</td><td>Bech32 wallet address (<code>dc1q...</code>).</td></tr>
+      <tr><td class="pname">Username</td><td class="ptype">string</td><td>Registered on-chain username.</td></tr>
+      <tr><td class="pname">Did</td><td class="ptype">string</td><td>Full DID: <code>did:dchat:&lt;username&gt;</code>.</td></tr>
+      <tr><td class="pname">PublicKey</td><td class="ptype">string</td><td>Hex-encoded Secp256k1 identity public key.</td></tr>
+      <tr><td class="pname">ChatPublicKey</td><td class="ptype">string?</td><td>Current chat public key (E2EE), published via profile updates.</td></tr>
+      <tr><td class="pname">CreatedAt</td><td class="ptype">DateTime</td><td>When the identity was registered on-chain.</td></tr>
+    </table>
+  </div>
+
+  <div class="page-nav">
+    <a href="configuration.html">
+      <span class="nav-dir"> Previous</span>
+      <span class="nav-title">Configuration</span>
+    </a>
+    <a href="encryption.html" class="next">
+      <span class="nav-dir">Next </span>
+      <span class="nav-title">Encryption</span>
+    </a>
+  </div>
+</main>
+</div>
+  <script src="_reveal.js"></script>
+<script src="_sidebar.js"></script>
+</body>
+</html>
+
+

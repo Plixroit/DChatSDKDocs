@@ -1,0 +1,290 @@
+<div class="topbar">
+  <div class="breadcrumb"><a href="#/intro" data-page="intro">DChat SDK</a> <span>></span> Encryption</div>
+</div>
+
+<div class="page-header">
+  <h1>Encryption</h1>
+  <p class="lead">DChat uses two complementary encryption schemes: asymmetric E2EE for 1-to-1 messages and symmetric sender keys for group messages. Both support automatic forward secrecy via key rotation.</p>
+</div>
+
+<!-- Overview diagram -->
+<div class="section">
+  <h2>Encryption Architecture</h2>
+  <div class="infographic">
+    <div class="infographic-title">Dual Encryption Scheme</div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem;">
+      <!-- Direct Messages Column -->
+      <div class="encrypt-column">
+        <div class="encrypt-header" style="background: linear-gradient(135deg, rgba(62, 207, 142, 0.15), rgba(62, 207, 142, 0.05)); border-color: rgba(62, 207, 142, 0.3);">
+          <i class="fa-solid fa-user" style="color: #3ecf8e;"></i>
+          <span>Direct Messages (1-to-1)</span>
+        </div>
+        
+        <div class="flow-diagram" style="margin-top: 1rem;">
+          <div class="flow-step">
+            <div class="flow-node" style="border-color: rgba(62, 207, 142, 0.2);">
+              <div class="flow-node-icon" style="background: rgba(62, 207, 142, 0.15);"><i class="fa-solid fa-file-lines" style="color: #3ecf8e;"></i></div>
+              <div class="flow-node-content">
+                <div class="flow-node-title">Plaintext</div>
+                <div class="flow-node-desc">MessagePayload JSON</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="flow-connector"><div class="flow-arrow" style="background: linear-gradient(180deg, rgba(62, 207, 142, 0.5), #3ecf8e);"></div></div>
+          
+          <div class="flow-step">
+            <div class="flow-node" style="border-color: rgba(62, 207, 142, 0.3); background: linear-gradient(145deg, rgba(62, 207, 142, 0.12), rgba(62, 207, 142, 0.05));">
+              <div class="flow-node-icon" style="background: rgba(62, 207, 142, 0.2);"><i class="fa-solid fa-lock" style="color: #3ecf8e;"></i></div>
+              <div class="flow-node-content">
+                <div class="flow-node-title" style="color: #3ecf8e;">ECIES</div>
+                <div class="flow-node-desc">recipientChatPublicKey</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="flow-connector"><div class="flow-arrow" style="background: linear-gradient(180deg, rgba(62, 207, 142, 0.5), #3ecf8e);"></div></div>
+          
+          <div class="flow-step">
+            <div class="flow-node" style="border-color: rgba(62, 207, 142, 0.2);">
+              <div class="flow-node-icon" style="background: rgba(62, 207, 142, 0.15);"><i class="fa-solid fa-network-wired" style="color: #3ecf8e;"></i></div>
+              <div class="flow-node-content">
+                <div class="flow-node-title">Network</div>
+                <div class="flow-node-desc">Encrypted envelope transmitted</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Group Messages Column -->
+      <div class="encrypt-column">
+        <div class="encrypt-header" style="background: linear-gradient(135deg, rgba(240, 160, 75, 0.15), rgba(240, 160, 75, 0.05)); border-color: rgba(240, 160, 75, 0.3);">
+          <i class="fa-solid fa-users" style="color: #22d3ee;"></i>
+          <span>Group Messages</span>
+        </div>
+        
+        <div class="flow-diagram" style="margin-top: 1rem;">
+          <div class="flow-step">
+            <div class="flow-node" style="border-color: rgba(240, 160, 75, 0.2);">
+              <div class="flow-node-icon" style="background: rgba(240, 160, 75, 0.15);"><i class="fa-solid fa-file-lines" style="color: #22d3ee;"></i></div>
+              <div class="flow-node-content">
+                <div class="flow-node-title">Plaintext</div>
+                <div class="flow-node-desc">MessagePayload JSON</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="flow-connector"><div class="flow-arrow" style="background: linear-gradient(180deg, rgba(240, 160, 75, 0.5), #22d3ee);"></div></div>
+          
+          <div class="flow-step">
+            <div class="flow-node" style="border-color: rgba(240, 160, 75, 0.3); background: linear-gradient(145deg, rgba(240, 160, 75, 0.12), rgba(240, 160, 75, 0.05));">
+              <div class="flow-node-icon" style="background: rgba(240, 160, 75, 0.2);"><i class="fa-solid fa-shield-halved" style="color: #22d3ee;"></i></div>
+              <div class="flow-node-content">
+                <div class="flow-node-title" style="color: #22d3ee;">AES-GCM</div>
+                <div class="flow-node-desc">SenderKey symmetric</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="flow-connector"><div class="flow-arrow" style="background: linear-gradient(180deg, rgba(240, 160, 75, 0.5), #22d3ee);"></div></div>
+          
+          <div class="flow-step">
+            <div class="flow-node" style="border-color: rgba(240, 160, 75, 0.2);">
+              <div class="flow-node-icon" style="background: rgba(240, 160, 75, 0.15);"><i class="fa-solid fa-network-wired" style="color: #22d3ee;"></i></div>
+              <div class="flow-node-content">
+                <div class="flow-node-title">Network</div>
+                <div class="flow-node-desc">Encrypted envelope transmitted</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="encrypt-note" style="margin-top: 1rem; padding: 12px; background: rgba(240, 160, 75, 0.08); border-radius: 10px; border: 1px dashed rgba(240, 160, 75, 0.3);">
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted);">
+            <i class="fa-solid fa-key" style="color: #22d3ee;"></i>
+            <span>SenderKey distributed via E2EE to each member</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <span class="callout-icon"><i class="fa-solid fa-circle-info"></i></span>
+    <div class="callout-body">Nodes never see plaintext. They only route opaque encrypted envelopes identified by wallet addresses.</div>
+  </div>
+</div>
+
+<!-- E2EE -->
+<div class="section">
+  <h2>End-to-End Encryption (Direct Messages)</h2>
+  <p>Direct messages use ECIES (Elliptic Curve Integrated Encryption Scheme) on top of Secp256k1 chat keys. The SDK manages key exchange automatically during the contact handshake.</p>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task&lt;string&gt;</span> <span class="name">EncryptMessageAsync</span>(<span class="type">string</span> <span class="param">message</span>, <span class="type">string</span> <span class="param">recipientPublicKey</span>, <span class="type">string</span> <span class="param">senderDid</span>)
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Encrypts a plaintext string with the recipient's Secp256k1 chat public key. Returns a JSON-serialised <code>EncryptedPayloadEnvelope</code>. Increments the sender's message count for rotation tracking.</p>
+      <table class="param-table">
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>message</td><td>string</td><td>Plaintext JSON of the <code>MessagePayload</code>.</td></tr>
+        <tr><td>recipientPublicKey</td><td>string</td><td>Hex-encoded Secp256k1 chat public key of the recipient.</td></tr>
+        <tr><td>senderDid</td><td>string</td><td>DID of the sender  used to look up the active chat key pair for the outbound-count increment.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task&lt;string&gt;</span> <span class="name">DecryptMessageAsync</span>(<span class="type">string</span> <span class="param">encryptedMessage</span>, <span class="type">string</span> <span class="param">senderPublicKey</span>, <span class="type">string</span> <span class="param">recipientDid</span>)
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Decrypts an encrypted envelope using the recipient's private chat key. The SDK automatically selects the correct key generation from the rotation chain based on the envelope metadata.</p>
+      <table class="param-table">
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>encryptedMessage</td><td>string</td><td>JSON-serialised <code>EncryptedPayloadEnvelope</code>.</td></tr>
+        <tr><td>senderPublicKey</td><td>string</td><td>Hex-encoded Secp256k1 public key of the sender.</td></tr>
+        <tr><td>recipientDid</td><td>string</td><td>DID of the local user  used to look up the right private key.</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ChatKeyPair -->
+<div class="section">
+  <h2>Chat Key Pair</h2>
+  <p><code>ChatKeyPair</code> is the short-lived E2EE key. It tracks its own rotation state.</p>
+  <table class="prop-table">
+    <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+    <tr><td class="pname">Id</td><td class="ptype">string</td><td>GUID unique to this key pair.</td></tr>
+    <tr><td class="pname">OwnerDid</td><td class="ptype">string</td><td>DID of the owner (<code>did:dchat:username</code>).</td></tr>
+    <tr><td class="pname">PublicKey</td><td class="ptype">string</td><td>Hex-encoded Secp256k1 public key. Safe to share.</td></tr>
+    <tr><td class="pname">PrivateKey</td><td class="ptype">string</td><td>Hex-encoded private key. <strong>Never transmitted.</strong></td></tr>
+    <tr><td class="pname">KeyGeneration</td><td class="ptype">int</td><td>Monotonically increasing rotation counter, starting at 1.</td></tr>
+    <tr><td class="pname">MessageCount</td><td class="ptype">long</td><td>Messages encrypted/decrypted with this key. Thread-safe.</td></tr>
+    <tr><td class="pname">MaxMessageCount</td><td class="ptype">long</td><td>Threshold for count-based rotation. Default: 10 000.</td></tr>
+    <tr><td class="pname">MaxAgeDays</td><td class="ptype">int</td><td>Threshold for age-based rotation. Default: 30 days.</td></tr>
+    <tr><td class="pname">IsActive</td><td class="ptype">bool</td><td><code>true</code> when the key is within its active window.</td></tr>
+    <tr><td class="pname">NeedsRotation</td><td class="ptype">bool</td><td><code>true</code> when count or age threshold is exceeded.</td></tr>
+    <tr><td class="pname">PreviousKeyId</td><td class="ptype">string?</td><td>ID of the predecessor key (linked list of generations).</td></tr>
+    <tr><td class="pname">NextKeyId</td><td class="ptype">string?</td><td>ID of the successor key after rotation.</td></tr>
+  </table>
+</div>
+
+<!-- Key rotation -->
+<div class="section">
+  <h2>Key Rotation</h2>
+  <p>Rotation replaces the active <code>ChatKeyPair</code> with a new one, notifying all contacts so they start using the new public key. Old keys are retained for decrypting historical messages.</p>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task&lt;bool&gt;</span> <span class="name">ShouldRotateKeyAsync</span>(<span class="type">string</span> <span class="param">ownerDid</span>)
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Checks the active key's <code>NeedsRotation</code> flag. Call this before sending to proactively trigger rotation when needed.</p>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task&lt;ChatKeyPair&gt;</span> <span class="name">RotateKeyAsync</span>(<span class="type">string</span> <span class="param">ownerDid</span>, <span class="type">string</span> <span class="param">reason</span> = <span class="str">"scheduled"</span>)
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Generates a new <code>ChatKeyPair</code>, marks the current one as rotated, links the chain (via <code>PreviousKeyId</code>/<code>NextKeyId</code>), and stores the new key.</p>
+      <table class="param-table">
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>ownerDid</td><td>string</td><td>DID of the key owner.</td></tr>
+        <tr><td>reason</td><td>string</td><td>"scheduled", "policy_triggered", "emergency", or "manual".</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task&lt;bool&gt;</span> <span class="name">SendKeyRotationMessageAsync</span>(<span class="type">string</span> <span class="param">recipientDid</span>, <span class="type">string</span> <span class="param">recipientWalletAddress</span>, <span class="type">string</span> <span class="param">recipientPublicKey</span>, <span class="type">string</span> <span class="param">newChatPublicKey</span>, <span class="type">string</span> <span class="param">reason</span>)
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Sends a <code>KeyRotationMessageData</code> to a contact so they can update their cached copy of your public key. Must be called after <code>RotateKeyAsync</code> for each active conversation.</p>
+    </div>
+  </div>
+
+  <h3>Rotation flow</h3>
+  <pre><span class="cm">// 1. Check if rotation is needed before sending</span>
+<span class="kw">if</span> (<span class="kw">await</span> sdk.<span class="met">ShouldRotateKeyAsync</span>(myDid))
+{
+    <span class="cm">// 2. Generate new key pair</span>
+    <span class="cls">ChatKeyPair</span> newKey = <span class="kw">await</span> sdk.<span class="met">RotateKeyAsync</span>(myDid, <span class="str">"policy_triggered"</span>);
+
+    <span class="cm">// 3. Notify all active contacts</span>
+    <span class="kw">foreach</span> (<span class="kw">var</span> contact <span class="kw">in</span> activeContacts)
+    {
+        <span class="kw">await</span> sdk.<span class="met">SendKeyRotationMessageAsync</span>(
+            contact.Did, contact.WalletAddress,
+            contact.ChatPublicKey, newKey.PublicKey,
+            <span class="str">"policy_triggered"</span>);
+    }
+}</pre>
+</div>
+
+<!-- Symmetric encryption -->
+<div class="section">
+  <h2>Symmetric Encryption (Group Messages)</h2>
+  <p>Group messages are encrypted with a symmetric AES-256-GCM key called a <em>sender key</em>. Each member has their own sender key distributed to all other members individually via E2EE envelopes.</p>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task&lt;string&gt;</span> <span class="name">EncryptSymmetricAsync</span>(<span class="type">string</span> <span class="param">plaintext</span>, <span class="type">string</span> <span class="param">symmetricKeyBase64</span>)
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Encrypts a plaintext string with a base64-encoded AES-256 key. Returns a JSON envelope containing the ciphertext, IV, and auth tag.</p>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <div class="method-sig">
+        <span class="ret">Task&lt;string&gt;</span> <span class="name">DecryptSymmetricAsync</span>(<span class="type">string</span> <span class="param">encryptedPayload</span>, <span class="type">string</span> <span class="param">symmetricKeyBase64</span>)
+      </div>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Decrypts a symmetric envelope using the provided AES key. The SDK looks up the correct sender key automatically when processing inbound group messages.</p>
+    </div>
+  </div>
+
+  <h3>Sender key management</h3>
+  <table class="prop-table" style="margin-top:.5rem">
+    <tr><th>Method</th><th>Description</th></tr>
+    <tr><td class="pname">GenerateSenderKeyAsync(ownerDid, groupId)</td><td>Creates a new 256-bit sender key for a member/group pair.</td></tr>
+    <tr><td class="pname">StoreSenderKeyAsync(ownerDid, groupId, keyBase64)</td><td>Persists a sender key in secure storage.</td></tr>
+    <tr><td class="pname">GetSenderKeyAsync(ownerDid, groupId)</td><td>Retrieves a stored sender key.</td></tr>
+    <tr><td class="pname">DeleteSenderKeyAsync(ownerDid, groupId)</td><td>Removes a sender key (e.g., on member removal).</td></tr>
+    <tr><td class="pname">IncrementSenderKeyMessageCountAsync(ownerDid, groupId)</td><td>Increments count and returns <code>true</code> if rotation is needed.</td></tr>
+    <tr><td class="pname">RotateSenderKeyAsync(groupId, memberDid, reason)</td><td>Generates a new sender key and distributes it to all group members.</td></tr>
+  </table>
+</div>
+
+<div class="page-nav">
+  <a href="#/identity" data-page="identity">
+    <span class="nav-dir"> Previous</span>
+    <span class="nav-title">Identity &amp; Keys</span>
+  </a>
+  <a href="#/messaging" data-page="messaging" class="next">
+    <span class="nav-dir">Next </span>
+    <span class="nav-title">Messaging</span>
+  </a>
+</div>
