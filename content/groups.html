@@ -286,6 +286,131 @@
   </div>
 </div>
 
+<!-- Handling Incoming Group Events -->
+<div class="section">
+  <h2>Handling Incoming Group Events</h2>
+  <p>When someone adds you to a group, the SDK receives a <code>GroupCreate</code> message and fires an event. Your app must listen and update its local state.</p>
+
+  <h3>Step 1: Subscribe to Group Events</h3>
+  <p>The SDK's <code>MessageTypeManager</code> fires events for all group protocol messages. Subscribe during app initialization:</p>
+
+  <pre><span class="cm">// In your service initialization (e.g., MessageStreamingService)</span>
+<span class="kw">using</span> DChatSDK.Messaging.Services;
+
+<span class="kw">public void</span> <span class="met">Initialize</span>()
+{
+    <span class="cm">// Group lifecycle events</span>
+    MessageTypeManager.GroupCreateReceived += HandleGroupCreateReceived;
+    MessageTypeManager.GroupMemberAddReceived += HandleGroupMemberAddReceived;
+    MessageTypeManager.GroupMemberRemoveReceived += HandleGroupMemberRemoveReceived;
+    MessageTypeManager.GroupAdminUpdateReceived += HandleGroupAdminUpdateReceived;
+
+    <span class="cm">// Group settings events</span>
+    MessageTypeManager.GroupNameChangeReceived += HandleGroupNameChangeReceived;
+    MessageTypeManager.GroupPhotoChangeReceived += HandleGroupPhotoChangeReceived;
+}</pre>
+
+  <h3>Step 2: Implement the Handler</h3>
+  <p>When you receive a <code>GroupCreate</code> event, save the group to your database so it appears in the chat list:</p>
+
+  <pre><span class="kw">private async void</span> <span class="met">HandleGroupCreateReceived</span>(<span class="kw">object</span> sender, GroupCreateReceivedEventArgs args)
+{
+    <span class="kw">var</span> groupId = args.GroupId.RawValue;
+
+    <span class="cm">// 1. Skip if already exists (duplicate message)</span>
+    <span class="kw">if</span> (<span class="kw">await</span> _groupRepo.<span class="met">GetByIdAsync</span>(groupId) != <span class="kw">null</span>)
+        <span class="kw">return</span>;
+
+    <span class="cm">// 2. Create group entity in your database</span>
+    <span class="kw">var</span> group = <span class="kw">new</span> <span class="cls">GroupEntity</span>
+    {
+        Id = groupId,
+        GroupName = args.GroupName,
+        GroupDescription = args.GroupDescription,
+        CreatorDid = args.CreatorDid,
+        CreatedAt = args.Timestamp,
+        KeyGeneration = 1,
+        StateVersion = 1
+    };
+    <span class="kw">await</span> _groupRepo.<span class="met">CreateAsync</span>(group);
+
+    <span class="cm">// 3. Add all members</span>
+    <span class="kw">foreach</span> (<span class="kw">var</span> memberDid <span class="kw">in</span> args.InitialMembers)
+    {
+        <span class="kw">var</span> profile = args.MemberProfiles.<span class="met">GetValueOrDefault</span>(memberDid);
+        <span class="kw">var</span> isAdmin = args.AdminList.<span class="met">Contains</span>(memberDid);
+
+        <span class="kw">await</span> _groupRepo.<span class="met">AddMemberAsync</span>(<span class="kw">new</span> <span class="cls">GroupMemberEntity</span>
+        {
+            GroupId = groupId,
+            MemberDid = memberDid,
+            MemberName = profile?.DisplayName ?? memberDid,
+            MemberChatPublicKey = profile?.PublicKey ?? <span class="str">""</span>,
+            Role = isAdmin ? GroupRole.Admin : GroupRole.Member,
+            IsActive = <span class="kw">true</span>
+        });
+    }
+
+    <span class="cm">// 4. Create chat entity so group appears in chat list</span>
+    <span class="kw">await</span> _chatRepo.<span class="met">CreateChatAsync</span>(<span class="kw">new</span> <span class="cls">ChatEntity</span>
+    {
+        Id = groupId,
+        IsGroupChat = <span class="kw">true</span>,
+        GroupName = args.GroupName,
+        DisplayNameOrGroupName = args.GroupName
+    });
+
+    <span class="cm">// 5. Fire UI event to refresh chat list</span>
+    _eventBus.<span class="met">Publish</span>(<span class="kw">new</span> <span class="cls">GroupCreatedEvent</span> { GroupId = groupId });
+}</pre>
+
+  <h3>Step 3: Handle Member Changes</h3>
+  <pre><span class="kw">private async void</span> <span class="met">HandleGroupMemberAddReceived</span>(<span class="kw">object</span> sender, GroupMemberAddReceivedEventArgs args)
+{
+    <span class="cm">// Add new member to database</span>
+    <span class="kw">await</span> _groupRepo.<span class="met">AddMemberAsync</span>(<span class="kw">new</span> <span class="cls">GroupMemberEntity</span>
+    {
+        GroupId = args.GroupId.RawValue,
+        MemberDid = args.NewMemberDid,
+        MemberName = args.MemberDisplayName,
+        Role = GroupRole.Member,
+        IsActive = <span class="kw">true</span>
+    });
+
+    <span class="cm">// Create system message: "Bob was added to the group"</span>
+    <span class="kw">await</span> _messageRepo.<span class="met">CreateSystemMessageAsync</span>(
+        args.GroupId.RawValue,
+        <span class="str">$"{args.MemberDisplayName} was added to the group"</span>);
+}
+
+<span class="kw">private async void</span> <span class="met">HandleGroupMemberRemoveReceived</span>(<span class="kw">object</span> sender, GroupMemberRemoveReceivedEventArgs args)
+{
+    <span class="cm">// Mark member as inactive</span>
+    <span class="kw">await</span> _groupRepo.<span class="met">RemoveMemberAsync</span>(args.GroupId.RawValue, args.RemovedMemberDid);
+
+    <span class="cm">// Create system message: "Bob was removed from the group"</span>
+    <span class="kw">await</span> _messageRepo.<span class="met">CreateSystemMessageAsync</span>(
+        args.GroupId.RawValue,
+        <span class="str">$"{args.RemovedMemberDid} was removed from the group"</span>);
+}</pre>
+
+  <h3>Event Types Reference</h3>
+  <table class="prop-table">
+    <tr><th>Event</th><th>When Fired</th><th>Key Args</th></tr>
+    <tr><td class="pname">GroupCreateReceived</td><td>You're added to a new group</td><td>GroupId, GroupName, InitialMembers, AdminList, MemberProfiles</td></tr>
+    <tr><td class="pname">GroupMemberAddReceived</td><td>New member added</td><td>GroupId, NewMemberDid, MemberDisplayName</td></tr>
+    <tr><td class="pname">GroupMemberRemoveReceived</td><td>Member removed</td><td>GroupId, RemovedMemberDid</td></tr>
+    <tr><td class="pname">GroupAdminUpdateReceived</td><td>Admin promoted/demoted</td><td>GroupId, TargetMemberDid, PromoteToAdmin</td></tr>
+    <tr><td class="pname">GroupNameChangeReceived</td><td>Group renamed</td><td>GroupId, NewName</td></tr>
+    <tr><td class="pname">GroupPhotoChangeReceived</td><td>Avatar changed</td><td>GroupId, NewPhotoCid</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <span class="callout-icon"><i class="fa-solid fa-triangle-exclamation"></i></span>
+    <div class="callout-body"><strong>Thread Safety:</strong> Events fire on background threads. Use <code>MainThread.BeginInvokeOnMainThread</code> (MAUI) or <code>Dispatcher.Dispatch</code> (WPF) when updating UI.</div>
+  </div>
+</div>
+
 <!-- Group messaging methods -->
 <div class="section">
   <h2>Group Messaging</h2>
