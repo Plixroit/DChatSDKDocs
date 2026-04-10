@@ -1,4 +1,6 @@
-# ![DChat Logo](Dchat.svg) DChat SDK Documentation
+![DChat Logo](Dchat.svg)
+
+# DChat SDK Documentation
 
 **A self-sovereign, end-to-end encrypted messaging SDK built on Cosmos blockchain**
 
