@@ -92,38 +92,122 @@
   <h2>Creating a Group</h2>
   <p>Groups are created by an admin who broadcasts a <code>GroupCreateMessageData</code> to all initial members. The SDK handles sender-key generation and distribution automatically.</p>
 
-  <div class="callout info">
-    <span class="callout-icon"><i class="fa-solid fa-circle-info"></i></span>
-    <div class="callout-body"><strong>See Group Control API</strong> - Full method signatures and parameters are documented in <a href="#/api-group-control" data-page="api-group-control">Group Control API</a>.</div>
+  <h3>Step-by-Step Guide</h3>
+
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">Step 1: Generate a Group ID</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Create a unique identifier for the group.</p>
+      <pre><span class="kw">string</span> groupId = sdk.<span class="met">GenerateGroupId</span>();
+<span class="cm">// Returns something like "dc1a2b3c4d5e6f..."</span></pre>
+    </div>
   </div>
 
-  <h3>Quick Example</h3>
-  <pre><span class="cm">// 1. Generate a unique group ID</span>
-<span class="kw">string</span> groupId = sdk.<span class="met">GenerateGroupId</span>(); <span class="cm">// e.g., "dc1a2b3c..."</span>
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">Step 2: Build the Member List</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Create <code>GroupMemberInfo</code> objects for each member. You need their DID, wallet address, and chat public key.</p>
+      <pre><span class="kw">var</span> members = <span class="kw">new</span> <span class="cls">List</span>&lt;<span class="cls">GroupMemberInfo</span>&gt;
+{
+    <span class="kw">new</span> <span class="cls">GroupMemberInfo</span>
+    {
+        Did = <span class="str">"did:dchat:alice"</span>,
+        WalletAddress = <span class="str">"dc1qalice..."</span>,
+        ChatPublicKey = <span class="str">"03a1b2c3..."</span>,  <span class="cm">// hex-encoded</span>
+        DisplayName = <span class="str">"Alice"</span>
+    },
+    <span class="kw">new</span> <span class="cls">GroupMemberInfo</span>
+    {
+        Did = <span class="str">"did:dchat:bob"</span>,
+        WalletAddress = <span class="str">"dc1qbob..."</span>,
+        ChatPublicKey = <span class="str">"03x9y8z7..."</span>,
+        DisplayName = <span class="str">"Bob"</span>
+    }
+};</pre>
+    </div>
+  </div>
 
-<span class="cm">// 2. Prepare initial members and admins</span>
-<span class="kw">var</span> initialMembers = <span class="kw">new</span> <span class="cls">List</span>&lt;<span class="cls">GroupMemberInfo</span>&gt; { alice, bob, charlie };
-<span class="kw">var</span> adminList = <span class="kw">new</span> <span class="cls">List</span>&lt;<span class="kw">string</span>&gt; { yourDid };
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">Step 3: Define Admins</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Admins can add/remove members and change group settings. At minimum, include yourself.</p>
+      <pre><span class="kw">var</span> admins = <span class="kw">new</span> <span class="cls">List</span>&lt;<span class="kw">string</span>&gt;
+{
+    <span class="str">"did:dchat:alice"</span>  <span class="cm">// your DID</span>
+};</pre>
+    </div>
+  </div>
 
-<span class="cm">// 3. Create the group payload</span>
-<span class="kw">var</span> createData = <span class="kw">new</span> <span class="cls">GroupCreateMessageData</span>
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">Step 4: Create the Payload</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Assemble all data into a <code>GroupCreateMessageData</code> object.</p>
+      <pre><span class="kw">var</span> createData = <span class="kw">new</span> <span class="cls">GroupCreateMessageData</span>
 {
     GroupId = groupId,
-    GroupName = <span class="str">"My Group"</span>,
-    Members = initialMembers,
-    Admins = adminList
+    GroupName = <span class="str">"My Project Team"</span>,
+    Members = members,
+    Admins = admins
+};</pre>
+    </div>
+  </div>
+
+  <div class="method-block">
+    <div class="method-header">
+      <span class="method-name">Step 5: Broadcast to Members</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Send the group creation message. The SDK will generate your sender key, encrypt it for each member, and broadcast everything.</p>
+      <pre><span class="kw">bool</span> success = <span class="kw">await</span> sdk.<span class="met">SendGroupCreateAsync</span>(createData, yourDid);
+
+<span class="kw">if</span> (success) {
+    Console.<span class="met">WriteLine</span>(<span class="str">$"Group {groupId} created successfully!"</span>);
+}</pre>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <span class="callout-icon"><i class="fa-solid fa-lightbulb"></i></span>
+    <div class="callout-body"><strong>What happens automatically:</strong> The SDK generates a sender key for you, encrypts it with each member's chat public key, and sends it in the <code>GroupCreate</code> message. Members can immediately decrypt your group messages.</div>
+  </div>
+
+  <h3>Full Example</h3>
+  <pre><span class="cm">// Create a group with Alice as admin, Bob and Charlie as members</span>
+
+<span class="cm">// 1. Generate ID</span>
+<span class="kw">string</span> groupId = sdk.<span class="met">GenerateGroupId</span>();
+
+<span class="cm">// 2. Build member list (you need their public keys from contact exchange)</span>
+<span class="kw">var</span> members = <span class="kw">new</span> <span class="cls">List</span>&lt;<span class="cls">GroupMemberInfo</span>&gt;
+{
+    <span class="kw">new</span> <span class="cls">GroupMemberInfo</span> { Did = <span class="str">"did:dchat:bob"</span>, WalletAddress = <span class="str">"dc1qbob..."</span>, ChatPublicKey = bobKey },
+    <span class="kw">new</span> <span class="cls">GroupMemberInfo</span> { Did = <span class="str">"did:dchat:charlie"</span>, WalletAddress = <span class="str">"dc1qcharlie..."</span>, ChatPublicKey = charlieKey }
 };
 
-<span class="cm">// 4. Broadcast creation to all members</span>
-<span class="kw">await</span> sdk.<span class="met">SendGroupCreateAsync</span>(createData, yourDid);</pre>
+<span class="cm">// 3. Define admins (include yourself)</span>
+<span class="kw">var</span> admins = <span class="kw">new</span> <span class="cls">List</span>&lt;<span class="kw">string</span>&gt; { <span class="str">"did:dchat:alice"</span> };
 
-  <h3>What Happens Internally</h3>
-  <ol style="margin-left: 1.5rem; color: var(--text-muted); line-height: 2;">
-    <li>SDK generates a sender key for you</li>
-    <li>Encrypts your sender key with each member's chat public key</li>
-    <li>Broadcasts the <code>GroupCreate</code> message to all members</li>
-    <li>Each member stores your sender key for decrypting your group messages</li>
-  </ol>
+<span class="cm">// 4. Create and send</span>
+<span class="kw">await</span> sdk.<span class="met">SendGroupCreateAsync</span>(<span class="kw">new</span> <span class="cls">GroupCreateMessageData</span>
+{
+    GroupId = groupId,
+    GroupName = <span class="str">"Project Team"</span>,
+    Members = members,
+    Admins = admins
+}, <span class="str">"did:dchat:alice"</span>);</pre>
+
+  <div class="callout info">
+    <span class="callout-icon"><i class="fa-solid fa-circle-info"></i></span>
+    <div class="callout-body"><strong>Full API Reference:</strong> See <a href="#/api-group-control" data-page="api-group-control">Group Control API</a> for all group management methods (add/remove members, change name, etc.).</div>
+  </div>
 </div>
 
 <!-- Detecting Groups -->
