@@ -1,4 +1,4 @@
-![DChat Logo](Dchat.svg)
+![DChat Logo](Dchat-small.svg)
 
 # DChat SDK Documentation
 
