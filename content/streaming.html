@@ -232,15 +232,14 @@ sdk.MessageReceived += <span class="kw">async</span> (_, _) => { };
   </div>
 
   <h3>Subscribing to events</h3>
-  <pre><span class="cm">// Wire up via IDChatSDKClient (recommended)</span>
-sdk.MessageReceived      += OnMessage;
-sdk.ConnectionChanged    += OnConnectionChanged;
+  <pre><span class="cm">// Subscribe to message events via MessageTypeManager (static)</span>
+<span class="kw">using</span> DChatSDK.Messaging.Services;
 
-<span class="cm">// Or subscribe to the raw streaming service directly</span>
-grpcService.OnMessageReceived    += (_, msg)   => HandleInbound(msg);
-grpcService.OnMessageFailed      += (_, msg)   => ScheduleRetry(msg);
-grpcService.OnReconnecting       += (_, attempt) => ShowBanner(attempt);
-grpcService.OnConnected          += (_, _)     => HideBanner();</pre>
+MessageTypeManager.TextMessageReceived += OnTextMessage;
+MessageTypeManager.ImageMessageReceived += OnImageMessage;
+
+<span class="cm">// Connection events are on the SDK client</span>
+sdk.ConnectionChanged += OnConnectionChanged;</pre>
 </div>
 
 <!-- Offline behaviour -->

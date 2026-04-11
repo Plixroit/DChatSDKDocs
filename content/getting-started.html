@@ -69,10 +69,12 @@ Console.<span class="met">WriteLine</span>(result.Identity.WalletAddress); <span
   <pre><span class="cm">// Activate the identity and open the gRPC stream</span>
 <span class="kw">bool</span> ok = <span class="kw">await</span> sdk.<span class="met">ConnectAsync</span>();
 
-<span class="cm">// Subscribe to incoming messages</span>
-sdk.MessageReceived += (_, msg) =>
+<span class="cm">// Subscribe to incoming messages via MessageTypeManager</span>
+<span class="kw">using</span> DChatSDK.Messaging.Services;
+
+MessageTypeManager.TextMessageReceived += (_, e) =>
 {
-    Console.<span class="met">WriteLine</span>($<span class="str">"New message from {msg.SenderId}: {msg.Content}"</span>);
+    Console.<span class="met">WriteLine</span>($<span class="str">"New message from {e.SenderDid}: {e.Message.Content}"</span>);
 };</pre>
 </div>
 
@@ -118,7 +120,7 @@ sdk.<span class="met">Dispose</span>();</pre>
 <span class="kw">await</span> sdk.<span class="met">StoreKeyPairAsync</span>(kp);
 <span class="kw">await</span> sdk.<span class="met">ConnectAsync</span>();
 
-sdk.MessageReceived += HandleMessage;
+MessageTypeManager.TextMessageReceived += HandleTextMessage;
 
 <span class="kw">await</span> sdk.<span class="met">SendTextMessageAsync</span>(
     <span class="str">"dc1qbob..."</span>, <span class="str">"Hey!"</span>,
@@ -159,7 +161,8 @@ services.<span class="met">AddSingleton</span>&lt;<span class="cls">IDChatSDKCli
     <span class="kw">public</span> <span class="met">ChatViewModel</span>(<span class="cls">IDChatSDKClient</span> sdk)
     {
         _sdk = sdk;
-        _sdk.MessageReceived += OnMessageReceived;
+        <span class="cm">// Subscribe to static events on MessageTypeManager</span>
+        MessageTypeManager.TextMessageReceived += OnTextMessageReceived;
     }
     
     <span class="kw">public async</span> <span class="cls">Task</span> <span class="met">SendMessageAsync</span>(<span class="kw">string</span> to, <span class="kw">string</span> content)
@@ -176,13 +179,17 @@ services.<span class="met">AddSingleton</span>&lt;<span class="cls">IDChatSDKCli
 
 <div class="section">
   <h2>Handling Incoming Messages</h2>
-  <p>Messages arrive decrypted and ready to use. Subscribe to <code>MessageReceived</code> and route by <code>Payload.Type</code>:</p>
+  <p>Messages arrive decrypted and ready to use. Subscribe to typed events on <code>MessageTypeManager</code>:</p>
   
-  <pre><span class="cm">// Subscribe once during initialization</span>
-sdk.MessageReceived += OnMessageReceived;
+  <pre><span class="cm">// Subscribe to typed events during initialization</span>
+<span class="kw">using</span> DChatSDK.Messaging.Services;
 
-<span class="cm">// Handler receives fully decrypted messages</span>
-<span class="kw">void</span> <span class="met">OnMessageReceived</span>(<span class="kw">object</span>? sender, <span class="cls">DecryptedMessage</span> msg)
+MessageTypeManager.TextMessageReceived += OnTextMessage;
+MessageTypeManager.ImageMessageReceived += OnImageMessage;
+MessageTypeManager.ContactRequestReceived += OnContactRequest;
+
+<span class="cm">// Handler receives typed event args</span>
+<span class="kw">void</span> <span class="met">OnTextMessage</span>(<span class="kw">object</span>? sender, <span class="cls">TextMessageReceivedEventArgs</span> e)
 {
     <span class="cm">// All messages have these core properties:</span>
     <span class="cm">// - msg.SenderId      (wallet address of sender)</span>

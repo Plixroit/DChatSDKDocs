@@ -4,12 +4,17 @@
 
 <div class="page-header">
   <h1>SDK Events</h1>
-  <p class="lead">All events raised by <code>IDChatSDKClient</code> for real-time notifications.</p>
+  <p class="lead">All events raised by <code>MessageTypeManager</code> for real-time notifications.</p>
+</div>
+
+<div class="callout info">
+  <span class="callout-icon"><i class="fa-solid fa-circle-info"></i></span>
+  <div class="callout-body"><strong>Where are events?</strong> All message events are <strong>static events</strong> on <code>MessageTypeManager</code> in namespace <code>DChatSDK.Messaging.Services</code>. Subscribe directly to the static class, not the SDK client instance.</div>
 </div>
 
 <div class="callout tip">
-  <span class="callout-icon"><i class="fa-solid fa-info-circle"></i></span>
-  <div class="callout-body">All events are raised on the thread pool. Marshal to the UI thread as required by your framework (e.g., <code>Dispatcher.Dispatch</code> in MAUI, <code>InvokeOnMainThread</code> in Xamarin).</div>
+  <span class="callout-icon"><i class="fa-solid fa-lightbulb"></i></span>
+  <div class="callout-body">All events are raised on the thread pool. Marshal to the UI thread as required by your framework (e.g., <code>Dispatcher.Dispatch</code> in MAUI, <code>MainThread.BeginInvokeOnMainThread</code> in MAUI).</div>
 </div>
 
 <div class="section">
@@ -302,18 +307,41 @@
 
 <div class="section">
   <h2>Subscribing to Events</h2>
-  <pre><span class="cm">// Subscribe to events after creating the SDK client</span>
-sdk.MessageReceived += OnMessageReceived;
-sdk.TextMessageReceived += OnTextMessage;
-sdk.ImageMessageReceived += OnImageMessage;
-sdk.ContactRequestReceived += OnContactRequest;
-sdk.OnConnected += OnConnected;
-sdk.OnDisconnected += OnDisconnected;
+  <p>All message events are static on <code>MessageTypeManager</code>. Subscribe during your service initialization:</p>
+
+  <pre><span class="kw">using</span> DChatSDK.Messaging.Services;
+
+<span class="cm">// In your service initialization</span>
+<span class="kw">public void</span> <span class="met">Initialize</span>()
+{
+    <span class="cm">// Message events</span>
+    MessageTypeManager.TextMessageReceived += OnTextMessage;
+    MessageTypeManager.ImageMessageReceived += OnImageMessage;
+    MessageTypeManager.AudioMessageReceived += OnAudioMessage;
+    MessageTypeManager.VideoMessageReceived += OnVideoMessage;
+    MessageTypeManager.FileMessageReceived += OnFileMessage;
+    MessageTypeManager.AlbumMessageReceived += OnAlbumMessage;
+    MessageTypeManager.LocationMessageReceived += OnLocationMessage;
+
+    <span class="cm">// Contact events</span>
+    MessageTypeManager.ContactRequestReceived += OnContactRequest;
+    MessageTypeManager.ContactResponseReceived += OnContactResponse;
+
+    <span class="cm">// Group events</span>
+    MessageTypeManager.GroupCreateReceived += OnGroupCreate;
+    MessageTypeManager.GroupMemberAddReceived += OnGroupMemberAdd;
+    MessageTypeManager.GroupMemberRemoveReceived += OnGroupMemberRemove;
+
+    <span class="cm">// Message lifecycle events</span>
+    MessageTypeManager.MessageEditReceived += OnMessageEdit;
+    MessageTypeManager.MessageDeleteReceived += OnMessageDelete;
+    MessageTypeManager.MessagePinReceived += OnMessagePin;
+}
 
 <span class="cm">// Handler example</span>
-<span class="kw">void</span> <span class="met">OnTextMessage</span>(<span class="kw">object</span>? sender, <span class="cls">TextMessageReceivedEventArgs</span> e)
+<span class="kw">private void</span> <span class="met">OnTextMessage</span>(<span class="kw">object</span>? sender, <span class="cls">TextMessageReceivedEventArgs</span> e)
 {
-    <span class="cm">// Marshal to UI thread if needed</span>
+    <span class="cm">// Marshal to UI thread</span>
     MainThread.<span class="met">BeginInvokeOnMainThread</span>(() => {
         <span class="kw">var</span> msg = e.Message;
         DisplayMessage(msg.SenderDid, msg.Content);
@@ -321,7 +349,12 @@ sdk.OnDisconnected += OnDisconnected;
 }
 
 <span class="cm">// Unsubscribe when disposing</span>
-sdk.MessageReceived -= OnMessageReceived;</pre>
+<span class="kw">public void</span> <span class="met">Dispose</span>()
+{
+    MessageTypeManager.TextMessageReceived -= OnTextMessage;
+    MessageTypeManager.ImageMessageReceived -= OnImageMessage;
+    <span class="cm">// ... unsubscribe all events</span>
+}</pre>
 </div>
 
 <div class="page-nav">
